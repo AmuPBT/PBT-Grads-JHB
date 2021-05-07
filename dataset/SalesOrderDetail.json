@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "SalesOrderDetail",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_sqldb_adventureworks_lt",
