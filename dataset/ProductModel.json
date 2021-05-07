@@ -33,7 +33,7 @@
 		],
 		"typeProperties": {
 			"schema": "SalesLT",
-			"table": "ProductDescription"
+			"table": "ProductModel"
 		}
 	}
 }
