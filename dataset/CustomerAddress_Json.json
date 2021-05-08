@@ -1,5 +1,5 @@
 {
-	"name": "Json1",
+	"name": "CustomerAddress_Json",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_adl_adventureworks_lt",
