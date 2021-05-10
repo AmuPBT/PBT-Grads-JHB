@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-grad-jhb"
+		},
+		"ls_adl_adventureworks_lt_accountKey": {
+			"value": ""
+		},
+		"ls_sqldb_adventureworks_lt_connectionString": {
+			"value": ""
+		},
+		"ls_adl_adventureworks_lt_properties_typeProperties_url": {
+			"value": "https://adlgen2gradjhb.dfs.core.windows.net"
+		},
+		"AzureDataLakeStorage1_properties_privateLinkResourceId": {
+			"value": "/subscriptions/d138d070-e1e1-4cce-89e7-3488bf444519/resourceGroups/rg-grad-jhb/providers/Microsoft.Storage/storageAccounts/adlgen2gradjhb"
+		},
+		"AzureDataLakeStorage1_properties_groupId": {
+			"value": "dfs"
+		}
+	}
+}
