@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "COPY INTO adventureworks_schema.ProductDescription_Dim\n(ProductDescriptionID 1, Description 2, ModifiedDate 4)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTProductDescription'\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
