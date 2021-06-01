@@ -1,5 +1,5 @@
 {
-	"name": "Dataflow1",
+	"name": "TransformCustOrder",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -22,7 +22,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "DelimitedText1",
+						"referenceName": "SinkCustomerOrders",
 						"type": "DatasetReference"
 					},
 					"name": "SinkCustomerOrders"
