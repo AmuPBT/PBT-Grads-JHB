@@ -1,5 +1,5 @@
 {
-	"name": "DelimitedText1",
+	"name": "SinkCustomerOrders",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_adl_adventureworks_lt",
