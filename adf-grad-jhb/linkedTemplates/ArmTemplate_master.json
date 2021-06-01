@@ -1,0 +1,118 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-grad-jhb"
+		},
+		"ls_adl_adventureworks_lt_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_adl_adventureworks_lt'"
+		},
+		"ls_sqldb_adventureworks_lt_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_sqldb_adventureworks_lt'"
+		},
+		"ls_synapse_adventureworks_lt_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_synapse_adventureworks_lt'"
+		},
+		"synapse-grad-jhb-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'synapse-grad-jhb-WorkspaceDefaultSqlServer'"
+		},
+		"ls_adl_adventureworks_lt_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlgen2gradjhb.dfs.core.windows.net"
+		},
+		"synapse-grad-jhb-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlgen2gradjhb.dfs.core.windows.net"
+		},
+		"AzureDataLakeStorage1_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/d138d070-e1e1-4cce-89e7-3488bf444519/resourceGroups/rg-grad-jhb/providers/Microsoft.Storage/storageAccounts/adlgen2gradjhb"
+		},
+		"AzureDataLakeStorage1_properties_groupId": {
+			"type": "string",
+			"defaultValue": "dfs"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adf-grad-jhb_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"ls_adl_adventureworks_lt_accountKey": {
+						"value": "[parameters('ls_adl_adventureworks_lt_accountKey')]"
+					},
+					"ls_sqldb_adventureworks_lt_connectionString": {
+						"value": "[parameters('ls_sqldb_adventureworks_lt_connectionString')]"
+					},
+					"ls_synapse_adventureworks_lt_connectionString": {
+						"value": "[parameters('ls_synapse_adventureworks_lt_connectionString')]"
+					},
+					"synapse-grad-jhb-WorkspaceDefaultSqlServer_connectionString": {
+						"value": "[parameters('synapse-grad-jhb-WorkspaceDefaultSqlServer_connectionString')]"
+					},
+					"ls_adl_adventureworks_lt_properties_typeProperties_url": {
+						"value": "[parameters('ls_adl_adventureworks_lt_properties_typeProperties_url')]"
+					},
+					"synapse-grad-jhb-WorkspaceDefaultStorage_properties_typeProperties_url": {
+						"value": "[parameters('synapse-grad-jhb-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+					},
+					"AzureDataLakeStorage1_properties_privateLinkResourceId": {
+						"value": "[parameters('AzureDataLakeStorage1_properties_privateLinkResourceId')]"
+					},
+					"AzureDataLakeStorage1_properties_groupId": {
+						"value": "[parameters('AzureDataLakeStorage1_properties_groupId')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "adf-grad-jhb_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-grad-jhb_ArmTemplate_0')]"
+			]
+		}
+	]
+}
