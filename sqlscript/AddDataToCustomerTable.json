@@ -1,0 +1,17 @@
+{
+	"name": "AddDataToCustomerTable",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'Customer_Dim' AND O.TYPE = 'U' AND S.NAME = 'adventureworks_schema')\nCREATE TABLE adventureworks_schema.Customer_Dim\n\t(\n\t [CustomerID] bigint,\n\t [Title] nvarchar(8),\n\t [FirstName] nvarchar(50),\n\t [MiddleName] nvarchar(50),\n\t [LastName] nvarchar(50),\n\t [Suffix] nvarchar(10),\n\t [CompanyName] nvarchar(128),\n\t [SalesPerson] nvarchar(256),\n\t [EmailAddress] nvarchar(50),\n\t [Phone] nvarchar(25),\n\t [PasswordHash] varchar(128),\n\t [PasswordSalt] varchar(10),\n\t [ModifiedDate] datetime2(0)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t)\nGO\n\nCOPY INTO adventureworks_schema.Customer_Dim\n(CustomerID 1, Title 3, FirstName 4, MiddleName 5, LastName 6, Suffix 7, CompanyName 8, SalesPerson 9, EmailAddress 10, Phone 11, PasswordHash 12, PasswordSalt 13, ModifiedDate 15)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTCustomer'\n\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.Customer_Dim\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

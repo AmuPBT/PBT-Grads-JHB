@@ -1,0 +1,17 @@
+{
+	"name": "CreateDateDim",
+	"properties": {
+		"content": {
+			"query": "CREATE TABLE [adventureworks_schema].[Date_Dim]\n(\n    [DateID] INT NOT NULL,\n    [Date] DATE NOT NULL,\n    [Day] TINYINT NOT NULL,\n    [Month] TINYINT NOT NULL,\n    [Year] INT NOT NULL,\n    [Quarter] TINYINT NOT NULL\n)\nWITH\n(\n    DISTRIBUTION = ROUND_ROBIN,\n    CLUSTERED COLUMNSTORE INDEX\n);\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

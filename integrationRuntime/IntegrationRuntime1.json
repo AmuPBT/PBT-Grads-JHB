@@ -1,14 +1,15 @@
 {
-	"name": "AutoResolveIntegrationRuntime",
+	"name": "IntegrationRuntime1",
 	"properties": {
 		"type": "Managed",
 		"typeProperties": {
 			"computeProperties": {
-				"location": "AutoResolve",
+				"location": "North Europe",
 				"dataFlowProperties": {
 					"computeType": "General",
 					"coreCount": 8,
-					"timeToLive": 0
+					"timeToLive": 0,
+					"cleanup": true
 				}
 			}
 		}
