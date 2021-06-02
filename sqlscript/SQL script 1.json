@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 1",
+	"properties": {
+		"content": {
+			"query": "TRUNCATE TABLE adventureworks_schema.Date_Dim\n\nDECLARE @CurrentDate DATE = '2000-01-01'\nDECLARE @EndDate DATE = '2000-12-31'\n\nWHILE @CurrentDate < @EndDate\nBEGIN\nINSERT INTO [adventureworks_schema].[Date_Dim](\n[DateID]\n,[Date]\n,[Day]\n,[Month]\n,[Quarter]\n,[Year]\n)\nSELECT [DateID] = YEAR(@CurrentDate) * 10000 + MONTH(@CurrentDate) * 100 + DAY(@CurrentDate),\n[Date] = @CurrentDate,\n[Day] = DAY(@CurrentDate),\n[Month] = MONTH(@CurrentDate),\n[Quarter] = DATEPART(q, @CurrentDate),\n[Year] = YEAR(@CurrentDate)\nSET @CurrentDate = DATEADD(DD, 1, @CurrentDate)\nEND\n\nSELECT * from adventureworks_schema.Date_Dim\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
