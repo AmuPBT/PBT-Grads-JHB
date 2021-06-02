@@ -1,0 +1,17 @@
+{
+	"name": "CreateSODFact",
+	"properties": {
+		"content": {
+			"query": "CREATE TABLE [adventureworks_schema].[SalesOrderDetail_Fact]\n(\n    [SalesOrderID]\tint\tNOT NULL,\n    [SalesOrderDetailID]\tint\tNOT NULL,\n    [OrderQty]\tsmallint NOT NULL,\n    [ProductID]\tint\tNOT NULL,\n    [UnitPrice]\tmoney NOT NULL,\t\n    [UnitPriceDiscount]\tmoney\tNOT NULL,\n    [LineTotal] MONEY\tNOT NULL,\t\n    [ModifiedDate]\tdatetime NOT NULL\n)\nWITH\n(\n    DISTRIBUTION = ROUND_ROBIN,\n    CLUSTERED COLUMNSTORE INDEX\n);\nCOPY INTO [adventureworks_schema].[SalesOrderDetail_Fact]\n(SalesOrderID 1, SalesOrderDetailID 2, OrderQty 3,ProductID 4\n,UnitPrice 5, UnitPriceDiscount 6, LineTotal 7, ModifiedDate 9)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLtSalesOrderDetail'\nGO\n\nSELECT * from [adventureworks_schema].[SalesOrderDetail_Fact]\n\t\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
