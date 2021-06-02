@@ -1,0 +1,17 @@
+{
+	"name": "CopyProdCatDim",
+	"properties": {
+		"content": {
+			"query": "COPY INTO adventureworks_schema.ProductCategory_Dim\n(ProductCategoryID 1, ParentProductCategoryID 2, Name 3, ModifiedDate 5)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTProductCategory'\n\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.ProductCategory_Dim\nGO\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
