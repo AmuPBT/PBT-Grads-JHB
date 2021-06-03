@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 3",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'Product_Description_Dim' AND O.TYPE = 'U' AND S.NAME = 'adventureworks_schema')\nCREATE TABLE adventureworks_schema.Product_Dim\n    (\n     [ProductDescriptionID] bigint,\n     [Description] nvarchar(400),\n     [ModifiedDate] datetime\n    )\nWITH\n    (\n    DISTRIBUTION = ROUND_ROBIN,\n    CLUSTERED COLUMNSTORE INDEX\n    )\nGO \n\n \n\nCOPY INTO adventureworks_schema.Product_Description_Dim\n(ProductDescriptionID 1, Description 2, ModifiedDate 4)\nFROM 'https://adlgen2gradjhb.blob.core.windows.net/dladventureworks/datalake/SalesLTProductDescription'\n\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

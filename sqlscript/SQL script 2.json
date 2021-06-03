@@ -1,8 +1,8 @@
 {
-	"name": "SQL script 1",
+	"name": "SQL script 2",
 	"properties": {
 		"content": {
-			"query": "SELECT * FROM [adventureworks_schema].[SalesOrderHeader_Fact]",
+			"query": "SELECT TOP (100) [DateID]\n,[Date]\n,[Day]\n,[Month]\n,[Year]\n,[Quarter]\n FROM [adventureworks_schema].[Date_Dim]\n ORDER BY [Date]",
 			"metadata": {
 				"language": "sql"
 			},
