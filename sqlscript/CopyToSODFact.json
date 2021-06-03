@@ -2,7 +2,7 @@
 	"name": "CopyToSODFact",
 	"properties": {
 		"content": {
-			"query": "COPY INTO adventureworks_schema.SalesOrderDetail_Fact\n(SalesOrderID 1, SalesOrderDetailID 2, OrderQty 3, ProductID 4, UnitPrice 5, UnitPriceDiscount 6, LineTotal 7, ModifiedDate 9)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderDetail'\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.SalesOrderDetail_Fact\nGO",
+			"query": "COPY INTO adventureworks_schema.SalesOrderDetail_Fact\n(SalesOrderID 1, SalesOrderDetailID 2, ModifiedDateID 9, OrderQty 3, ProductID 4, UnitPrice 5, UnitPriceDiscount 6, LineTotal 7)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderDetail'\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.SalesOrderDetail_Fact\nGO",
 			"metadata": {
 				"language": "sql"
 			},

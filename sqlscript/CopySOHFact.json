@@ -1,0 +1,17 @@
+{
+	"name": "CopySOHFact",
+	"properties": {
+		"content": {
+			"query": "COPY INTO adventureworks_schema.SalesOrderHeader_Fact\n(SalesOrderID 1, CustomerID 11, ShipToAddressID 12, BillToAddressID 13, OrderDateID 3, DueDateID 4, \nShipDateID 5, ModifiedDateID 22, SubTotal 16, TaxAmt 17, Freight 18, TotalDue 19)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderHeader'\n\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.SalesOrderHeader_Fact\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
