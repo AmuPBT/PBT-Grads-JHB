@@ -21,12 +21,12 @@
 						"recursive": true
 					},
 					"sink": {
-						"type": "ParquetSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "ParquetWriteSettings"
+						"type": "SqlDWSink",
+						"allowPolyBase": true,
+						"polyBaseSettings": {
+							"rejectValue": 0,
+							"rejectType": "value",
+							"useTypeDefault": true
 						}
 					},
 					"enableStaging": false
@@ -39,7 +39,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "StagingParquet",
+						"referenceName": "AzureSqlDWDestinationStore",
 						"type": "DatasetReference"
 					}
 				]
@@ -67,6 +67,12 @@
 					"dataflow": {
 						"referenceName": "Trasformation",
 						"type": "DataFlowReference"
+					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "synapse-grad-jhb-WorkspaceDefaultStorage",
+							"type": "LinkedServiceReference"
+						}
 					},
 					"compute": {
 						"coreCount": 8,
