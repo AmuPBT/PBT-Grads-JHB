@@ -2,8 +2,11 @@
 	"name": "AzureSqlDWDestinationStore",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_synapse_adventureworks_lt",
-			"type": "LinkedServiceReference"
+			"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"DBName": "AW_Schema"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlDWTable",
