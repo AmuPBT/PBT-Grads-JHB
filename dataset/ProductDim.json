@@ -3,7 +3,10 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"DBName": "sqlpool_adventureworksLT_jhb"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlDWTable",
