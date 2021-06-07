@@ -10,7 +10,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "adventureworks_schema",
-			"table": "copyActivity"
+			"table": "Product_Dim"
 		}
 	}
 }
