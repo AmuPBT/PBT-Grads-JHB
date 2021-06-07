@@ -72,7 +72,8 @@
 						"linkedService": {
 							"referenceName": "synapse-grad-jhb-WorkspaceDefaultStorage",
 							"type": "LinkedServiceReference"
-						}
+						},
+						"folderPath": "synapse/stagingFolder"
 					},
 					"compute": {
 						"coreCount": 8,
