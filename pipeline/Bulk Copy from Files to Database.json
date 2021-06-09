@@ -215,7 +215,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "AzureSqlDWSinkDataset",
+									"referenceName": "AzureSqlDWDestinationStore",
 									"type": "DatasetReference"
 								}
 							]
