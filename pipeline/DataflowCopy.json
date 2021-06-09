@@ -21,8 +21,7 @@
 						"recursive": true
 					},
 					"sink": {
-						"type": "SqlDWSink",
-						"tableOption": "autoCreate"
+						"type": "SqlDWSink"
 					},
 					"enableStaging": false
 				},
