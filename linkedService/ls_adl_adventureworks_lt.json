@@ -6,7 +6,7 @@
 		"type": "AzureBlobFS",
 		"typeProperties": {
 			"url": "https://adlgen2gradjhb.dfs.core.windows.net",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIlNZTkFQU0UtR1JBRC1KSEJfZDRjYTgyNTktZjQyOC00MTk4LWFmYTEtYmJlMDk3YjQ4YmZlIg0KfQ=="
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIlNZTkFQU0UtR1JBRC1KSEJfNzYyNzk4MDAtZTJmZC00ZjBjLWE4MDQtYTY5ZmVlMThmZDQzIg0KfQ=="
 		},
 		"connectVia": {
 			"referenceName": "AutoResolveIntegrationRuntime",
