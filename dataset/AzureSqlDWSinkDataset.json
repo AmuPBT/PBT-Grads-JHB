@@ -4,7 +4,10 @@
 		"description": "Connection to your destination data store.",
 		"linkedServiceName": {
 			"referenceName": "ls_synapse_adventureworks_lt",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"dbo": "sqlpool_adventureworksLT_jhb"
+			}
 		},
 		"parameters": {
 			"sinkTableName": {
@@ -16,10 +19,7 @@
 		"schema": [],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": {
-				"value": "@dataset().sinkTableName",
-				"type": "Expression"
-			}
+			"table": "CustomerDim"
 		}
 	}
 }
