@@ -20,6 +20,7 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
+							"wildcardFileName": "*",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -35,7 +36,14 @@
 							"useTypeDefault": true
 						}
 					},
-					"enableStaging": false
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "ls_adl_adventureworks_lt",
+							"type": "LinkedServiceReference"
+						},
+						"path": "synapse/stagingFolder"
+					}
 				},
 				"inputs": [
 					{
