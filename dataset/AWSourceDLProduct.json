@@ -1,5 +1,5 @@
 {
-	"name": "AdventureWorksSourceDL",
+	"name": "AWSourceDLProduct",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_adl_adventureworks_lt",
