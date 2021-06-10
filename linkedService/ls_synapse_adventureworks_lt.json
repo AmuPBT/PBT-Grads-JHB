@@ -2,7 +2,7 @@
 	"name": "ls_synapse_adventureworks_lt",
 	"properties": {
 		"parameters": {
-			"dbo": {
+			"adventureworks_schema": {
 				"type": "string",
 				"defaultValue": "sqlpool_adventureworksLT_jhb"
 			}
