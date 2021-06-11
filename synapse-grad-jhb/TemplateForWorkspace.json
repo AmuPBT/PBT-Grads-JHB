@@ -256,7 +256,7 @@
 				"description": "Run dataflow with Explicit copy to ingest copy source",
 				"activities": [
 					{
-						"name": "Dim",
+						"name": "DimLoader",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -269,7 +269,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "DimesionTrasformation",
+								"referenceName": "DimensionTrasformation",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
@@ -297,7 +297,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/DimesionTrasformation')]",
+				"[concat(variables('workspaceId'), '/dataflows/DimensionTrasformation')]",
 				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
@@ -346,7 +346,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/DfFactLoader')]"
+				"[concat(variables('workspaceId'), '/dataflows/DfFactLoader')]",
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -2609,7 +2610,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/DimesionTrasformation')]",
+			"name": "[concat(parameters('workspaceName'), '/DimensionTrasformation')]",
 			"type": "Microsoft.Synapse/workspaces/dataflows",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -2921,12 +2922,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/CreateDateDim')]",
+			"name": "[concat(parameters('workspaceName'), '/CreateDateDimension')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "CREATE TABLE [adventureworks_schema].[Date_Dim]\n(\n    [DateID] INT NOT NULL,\n    [Date] DATE NOT NULL,\n    [Day] TINYINT NOT NULL,\n    [Month] TINYINT NOT NULL,\n    [Year] INT NOT NULL,\n    [Quarter] TINYINT NOT NULL\n)\nWITH\n(\n    DISTRIBUTION = ROUND_ROBIN,\n    CLUSTERED COLUMNSTORE INDEX\n);\n",
+					"query": "DROP TABLE [adventureworks_schema].[Date_Dim]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[Date_Dim]\n( \n\t[DateID] [date]  NOT NULL,\n\t[Date] [date]  NOT NULL,\n\t[Day] NVARCHAR(10)  NOT NULL,\n\t[Month] NVARCHAR(10) NOT NULL,\n\t[Year] int  NOT NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -3087,246 +3088,6 @@
 			"properties": {
 				"content": {
 					"query": "CREATE PROCEDURE [adventureworks_schema].[PopulateDateDimensionForYear] @Year [int] AS\nBEGIN\n    IF OBJECT_ID('tempdb..#month', 'U') IS NOT NULL\n        DROP TABLE #month\n    CREATE TABLE #month (\n        monthnum int,\n        numofdays int\n    )\n    WITH ( DISTRIBUTION = ROUND_ROBIN, heap )\n    INSERT INTO #month\n        SELECT 1, 31 UNION SELECT 2, CASE WHEN (@YEAR % 4 = 0 AND @YEAR % 100 <> 0) OR @YEAR % 400 = 0 THEN 29 ELSE 28 END UNION SELECT 3,31 UNION SELECT 4,30 UNION SELECT 5,31 UNION SELECT 6,30 UNION SELECT 7,31 UNION SELECT 8,31 UNION SELECT 9,30 UNION SELECT 10,31 UNION SELECT 11,30 UNION SELECT 12,31\n\n    IF OBJECT_ID('tempdb..#days', 'U') IS NOT NULL\n        DROP TABLE #days\n    CREATE TABLE #days (days int)\n    WITH (DISTRIBUTION = ROUND_ROBIN, HEAP)\n\n    INSERT INTO #days\n        SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20    UNION SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30 UNION SELECT 31\n\n    INSERT [adventureworks_schema].[Date_Dim] (\n       [DateID], [Date], [Day], [Month], [Year]\n    )\n    SELECT\n        CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [DateID]\n        ,CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [Date]\n        ,CAST(DATENAME(day, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' \n            + CAST(@year AS CHAR(4)) AS DATE)) AS NVARCHAR(10)) AS [Day]\n        ,CAST(DATENAME(month, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) \n            + '/' + CAST(@year as char(4)) AS DATE)) AS nvarchar(10)) AS [Month]\n        ,CAST(@year as char(4)) AS [Year]\nFROM #month m\n    CROSS JOIN #days d\nWHERE d.days <= m.numofdays\n\nDROP table #month;\nDROP table #days;\nEND;\n\nDECLARE @Counter INT \nSET @Counter=2000\nWHILE ( @Counter <= 2021)\nBEGIN\n    exec adventureworks_schema.PopulateDateDimensionForYear @Year = @Counter\n    SET @Counter  = @Counter  + 1\nEND\n\nSELECT * FROM [adventureworks_schema].[Date_Dim]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT * FROM [adventureworks_schema].[SalesOrderHeader_Fact]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 10')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[Date_Dim]\n( \n\t[DateID] [date]  NOT NULL,\n\t[Date] [date]  NOT NULL,\n\t[Day] [tinyint]  NOT NULL,\n\t[Month] [tinyint]  NOT NULL,\n\t[Year] [int]  NOT NULL,\n\t[Quarter] [tinyint]  NOT NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 11')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "DROP TABLE [adventureworks_schema].[Date_Dim]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[Date_Dim]\n( \n\t[DateID] [date]  NOT NULL,\n\t[Date] [date]  NOT NULL,\n\t[Day] NVARCHAR(10)  NOT NULL,\n\t[Month] NVARCHAR(10) NOT NULL,\n\t[Year] int  NOT NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 12')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "DROP PROCEDURE [adventureworks_schema].[PopulateDateDimensionForYear]\nGO\n\n",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 13')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[SalesOrderHeader]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[SalesOrderHeader]\n\t(\n\t [SalesOrderID] bigint,\n\t [RevisionNumber] bigint,\n\t [OrderDate] datetime2(0),\n\t [DueDate] datetime2(0),\n\t [ShipDate] datetime2(0),\n\t [Status] bigint,\n\t [OnlineOrderFlag] bit,\n\t [SalesOrderNumber] nvarchar(4000),\n\t [PurchaseOrderNumber] nvarchar(4000),\n\t [AccountNumber] bigint,\n\t [CustomerID] bigint,\n\t [ShipToAddressID] bigint,\n\t [BillToAddressID] bigint,\n\t [ShipMethod] nvarchar(4000),\n\t [CreditCardApprovalCode] nvarchar(4000),\n\t [SubTotal] float,\n\t [TaxAmt] float,\n\t [Freight] float,\n\t [TotalDue] float,\n\t [Comment] nvarchar(4000),\n\t [rowguid] uniqueidentifier,\n\t [ModifiedDateID] datetime2(0)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[SalesOrderHeader]\n--AS\n--BEGIN\nCOPY INTO [ext].[SalesOrderHeader]\n(SalesOrderID 1, RevisionNumber 2, OrderDate 3, DueDate 4, ShipDate 5, Status 6, OnlineOrderFlag 7, SalesOrderNumber 8, PurchaseOrderNumber 9, AccountNumber 10, CustomerID 11, ShipToAddressID 12, BillToAddressID 13, ShipMethod 14, CreditCardApprovalCode 15, SubTotal 16, TaxAmt 17, Freight 18, TotalDue 19, Comment 20, rowguid 21, ModifiedDateID 22)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderHeader'\nGO\n\nSELECT TOP 100 * FROM [ext].[SalesOrderHeader]\nGO",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT TOP (100) [DateID]\n,[Date]\n,[Day]\n,[Month]\n,[Year]\n,[Quarter]\n FROM [adventureworks_schema].[Date_Dim]\n ORDER BY [Date]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'Product_Description_Dim' AND O.TYPE = 'U' AND S.NAME = 'adventureworks_schema')\nCREATE TABLE adventureworks_schema.Product_Dim\n    (\n     [ProductDescriptionID] bigint,\n     [Description] nvarchar(400),\n     [ModifiedDate] datetime\n    )\nWITH\n    (\n    DISTRIBUTION = ROUND_ROBIN,\n    CLUSTERED COLUMNSTORE INDEX\n    )\nGO \n\n \n\nCOPY INTO adventureworks_schema.Product_Description_Dim\n(ProductDescriptionID 1, Description 2, ModifiedDate 4)\nFROM 'https://adlgen2gradjhb.blob.core.windows.net/dladventureworks/datalake/SalesLTProductDescription'\n\nGO",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 5')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "CREATE SCHEMA ext;\nselect Firstname, Amount, PostalCode, LastName, AccountNumber\nfrom\n(\n  select value, columnname\n  from yourtable\n) d\npivot\n(\n  max(value)\n  for columnname in (Firstname, Amount, PostalCode, LastName, AccountNumber)\n) piv;",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 6')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT ProductID, ProductName, ProductNumber, Color, StandardCost, ListPrice,\n    Size, Weight, P.ProductCategoryID, ProductCategoryName, P.ProductModelID, ProductModelName, \n    PD.ProductDescriptionID, DescriptionAr, DescriptionEn, DescriptionFr, DescriptionHe, \n    DescriptionTh, DescriptionZh-cht, SellStartDateID, SellEndDateID, \n    DiscontinuedDateID, ThumbnailPhotoFileName, ModifiedDateID\nfrom ext.Product P\nJOIN ext.ProductCat PC on P.ProductCategoryID = PC.ProductCategoryID \nJOIN ext.ProductMod PM on P.ProductModelID = PM.ProductModelID \nJOIN ext.ProductModelProductDescription PMPD on PMPD.ProductModelID = PM.ProductModelID\nJOIN ext.ProductDesc PD on PD.ProductDescriptionID = PMPD.ProductDescriptionID   \n\nselect ar, he, en, th, fr\nfrom\n(\n  select Culture, Description\n  from ext.ProductModelProductDescription PMPD join ext.ProductDesc PD on PMPD.ProductDescriptionID = PD.ProductDescriptionID\n) d\npivot\n(\n  max(Description)\n  for Culture in (ar, he, en, th, fr)\n) piv;",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 7')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT TOP (100) [ProductModelID]\n,[ProductModelName]\n FROM [ext].[ProductMod]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 8')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "DROP TABLE [adventureworks_schema].[Product_Dim]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[Product_Dim]\n( \n\t[ProductID] [int]  NULL,\n\t[ModelName] [nvarchar](100)  NULL,\n\t[ProductName] [nvarchar](100)  NULL,\n\t[Color] [nvarchar](150)  NULL,\n\t[ProductNumber] [nvarchar](250)  NULL,\n\t[ProductCategoryName] [nvarchar](250)  NULL,\n\t[Size] [nvarchar](50)  NULL,\n\t[ListPrice] [decimal](8,2)  NULL,\n\t[StandardCost] [decimal](8,2)  NULL,\n\t[Weight] [decimal](8,2)  NULL,\n\t[SellEndDateID] [datetime]  NULL,\n\t[SellStartDateID] [datetime]  NULL,\n\t[DiscontinuedDateID] [datetime]  NULL,\n\t[ModifiedDateID] [datetime]  NULL,\n\t[DescriptionCultureAr] [nvarchar](1000)  NULL,\n\t[DescriptionCultureEn] [nvarchar](1000)  NULL,\n\t[DescriptionCultureFr] [nvarchar](1000)  NULL,\n\t[DescriptionCultureHe] [nvarchar](1000)  NULL,\n\t[DescriptionCultureTh] [nvarchar](1000)  NULL,\n\t[DescriptionCultureZh-cht] [nvarchar](1000)  NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
 					"metadata": {
 						"language": "sql"
 					},
