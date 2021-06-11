@@ -1,5 +1,5 @@
 {
-	"name": "SQL script 11",
+	"name": "CreateDateDimension",
 	"properties": {
 		"content": {
 			"query": "DROP TABLE [adventureworks_schema].[Date_Dim]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[Date_Dim]\n( \n\t[DateID] [date]  NOT NULL,\n\t[Date] [date]  NOT NULL,\n\t[Day] NVARCHAR(10)  NOT NULL,\n\t[Month] NVARCHAR(10) NOT NULL,\n\t[Year] int  NOT NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
