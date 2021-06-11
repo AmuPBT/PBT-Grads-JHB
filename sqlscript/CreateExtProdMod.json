@@ -1,0 +1,17 @@
+{
+	"name": "CreateExtProdMod",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[ProductMod]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[ProductMod]\n\t(\n\t [ProductModelID] int,\n\t [ProductModelName] nvarchar(4000)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[Product]\n--AS\n--BEGIN\nCOPY INTO [ext].[ProductMod]\n(ProductModelID 1, ProductModelName 2)\nFROM 'https://adlgen2gradjhb.blob.core.windows.net/dladventureworks/datalake/SalesLTProductModel'\n\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[ProductMod]\nGO\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
