@@ -20,14 +20,12 @@
 						"referenceName": "Trasformation",
 						"type": "DataFlowReference"
 					},
-					"staging": {
-						"folderPath": "synapse/stagingFolder"
-					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
 					},
-					"traceLevel": "Fine"
+					"traceLevel": "Fine",
+					"continueOnError": true
 				}
 			}
 		],
