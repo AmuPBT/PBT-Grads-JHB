@@ -2,7 +2,7 @@
 	"name": "SQL script 5",
 	"properties": {
 		"content": {
-			"query": "CREATE SCHEMA ext;",
+			"query": "CREATE SCHEMA ext;\nselect Firstname, Amount, PostalCode, LastName, AccountNumber\nfrom\n(\n  select value, columnname\n  from yourtable\n) d\npivot\n(\n  max(value)\n  for columnname in (Firstname, Amount, PostalCode, LastName, AccountNumber)\n) piv;",
 			"metadata": {
 				"language": "sql"
 			},

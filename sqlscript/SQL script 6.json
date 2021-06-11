@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 6",
+	"properties": {
+		"content": {
+			"query": "SELECT ProductID, ProductName, ProductNumber, Color, StandardCost, ListPrice,\n    Size, Weight, P.ProductCategoryID, ProductCategoryName, P.ProductModelID, ProductModelName, \n    PD.ProductDescriptionID, DescriptionAr, DescriptionEn, DescriptionFr, DescriptionHe, \n    DescriptionTh, DescriptionZh-cht, SellStartDateID, SellEndDateID, \n    DiscontinuedDateID, ThumbnailPhotoFileName, ModifiedDateID\nfrom ext.Product P\nJOIN ext.ProductCat PC on P.ProductCategoryID = PC.ProductCategoryID \nJOIN ext.ProductMod PM on P.ProductModelID = PM.ProductModelID \nJOIN ext.ProductModelProductDescription PMPD on PMPD.ProductModelID = PM.ProductModelID\nJOIN ext.ProductDesc PD on PD.ProductDescriptionID = PMPD.ProductDescriptionID   \n\nselect ar, he, en, th, fr\nfrom\n(\n  select Culture, Description\n  from ext.ProductModelProductDescription PMPD join ext.ProductDesc PD on PMPD.ProductDescriptionID = PD.ProductDescriptionID\n) d\npivot\n(\n  max(Description)\n  for Culture in (ar, he, en, th, fr)\n) piv;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

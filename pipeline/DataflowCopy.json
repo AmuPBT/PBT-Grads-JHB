@@ -4,51 +4,9 @@
 		"description": "Run dataflow with Explicit copy to ingest copy source",
 		"activities": [
 			{
-				"name": "LoadData",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureBlobFSSource",
-						"recursive": true
-					},
-					"sink": {
-						"type": "SqlDWSink"
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "AzureBlobFSSourceDatasetEntity",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ProductDim",
-						"type": "DatasetReference"
-					}
-				]
-			},
-			{
 				"name": "Trasformation",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [
-					{
-						"activity": "LoadData",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -63,10 +21,6 @@
 						"type": "DataFlowReference"
 					},
 					"staging": {
-						"linkedService": {
-							"referenceName": "synapse-grad-jhb-WorkspaceDefaultStorage",
-							"type": "LinkedServiceReference"
-						},
 						"folderPath": "synapse/stagingFolder"
 					},
 					"compute": {
