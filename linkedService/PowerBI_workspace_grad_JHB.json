@@ -1,0 +1,11 @@
+{
+	"name": "PowerBI_workspace_grad_JHB",
+	"properties": {
+		"annotations": [],
+		"type": "PowerBIWorkspace",
+		"typeProperties": {
+			"workspaceID": "9263ac14-5e7a-4e15-9c4a-2981e1d4d6b3",
+			"tenantID": "16e79c95-57c1-497d-bd45-06210b204f16"
+		}
+	}
+}
