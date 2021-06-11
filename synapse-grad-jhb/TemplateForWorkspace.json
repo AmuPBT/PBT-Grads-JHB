@@ -37,15 +37,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/sqlpool_adventureworksLT_jhb')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/CopyPipeline_sql_to_datalake')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -297,8 +288,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/DimensionTrasformation')]",
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/dataflows/DimensionTrasformation')]"
 			]
 		},
 		{
@@ -346,8 +336,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/DfFactLoader')]",
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/dataflows/DfFactLoader')]"
 			]
 		},
 		{
@@ -2338,6 +2327,20 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PowerBI_workspace_grad_JHB')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "PowerBIWorkspace",
+				"typeProperties": {
+					"workspaceID": "9263ac14-5e7a-4e15-9c4a-2981e1d4d6b3",
+					"tenantID": "16e79c95-57c1-497d-bd45-06210b204f16"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/ls_adl_adventureworks_lt')]",
