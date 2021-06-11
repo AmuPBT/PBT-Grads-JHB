@@ -1,0 +1,70 @@
+{
+	"name": "DfFactLoader",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DateDimension",
+						"type": "DatasetReference"
+					},
+					"name": "Date"
+				},
+				{
+					"dataset": {
+						"referenceName": "CustomerDimension",
+						"type": "DatasetReference"
+					},
+					"name": "Customer"
+				},
+				{
+					"dataset": {
+						"referenceName": "SalesLTSOH",
+						"type": "DatasetReference"
+					},
+					"name": "SalesLTSOH"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SalesOrderHeaderFact",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSOH"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinOrderDate"
+				},
+				{
+					"name": "JoinCustomer"
+				},
+				{
+					"name": "SelectSOH"
+				},
+				{
+					"name": "JoinDueDate"
+				},
+				{
+					"name": "SelectSOH1"
+				},
+				{
+					"name": "JoinShipDate"
+				},
+				{
+					"name": "SelectSOH2"
+				},
+				{
+					"name": "JoinModifiedDate"
+				},
+				{
+					"name": "SelectSOH3"
+				}
+			],
+			"script": "source(output(\n\t\tDateID as date,\n\t\tDate as date,\n\t\tDay as string,\n\t\tMonth as string,\n\t\tYear as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Date\nsource(output(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Customer\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as short,\n\t\tOrderDate as date,\n\t\tDueDate as date,\n\t\tShipDate as date,\n\t\tStatus as short,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipMethod as string,\n\t\tCreditCardApprovalCode as string,\n\t\tSubTotal as double,\n\t\tTaxAmt as double,\n\t\tFreight as double,\n\t\tTotalDue as double,\n\t\tComment as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SalesLTSOH\nSalesLTSOH, Date join(OrderDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinOrderDate\nJoinOrderDate, Customer join(SalesLTSOH@CustomerID == Customer@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinCustomer\nJoinCustomer select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID = DateID,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID = Customer@CustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate = SalesLTSOH@ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH\nSelectSOH, Date join(DueDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinDueDate\nJoinDueDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID = DateID,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH1\nSelectSOH1, Date join(ShipDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinShipDate\nJoinShipDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID = DateID,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH2\nSelectSOH2, Date join(ModifiedDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinModifiedDate\nJoinModifiedDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDateID = DateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH3\nSelectSOH3 sink(input(\n\t\tSalesOrderID as integer,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tOrderDateID as date,\n\t\tDueDateID as date,\n\t\tShipDateID as date,\n\t\tModifiedDateID as date,\n\t\tOnlineOrderFlag as boolean,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tmapColumn(\n\t\tSalesOrderID,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID,\n\t\tModifiedDateID,\n\t\tOnlineOrderFlag,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSOH"
+		}
+	}
+}
