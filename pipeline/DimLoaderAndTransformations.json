@@ -17,7 +17,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DimesionTrasformation",
+						"referenceName": "DimensionTrasformation",
 						"type": "DataFlowReference"
 					},
 					"compute": {
