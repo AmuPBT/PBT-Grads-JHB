@@ -1,0 +1,17 @@
+{
+	"name": "CreaterExtProdDesc",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[ProductDesc]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[ProductDesc]\n\t(\n\t [ProductDescriptionID] int,\n\t [Description] nvarchar(4000)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[ProductCat]\n--AS\n--BEGIN\nINSERT INTO [ext].[ProductDesc]\n(ProductDescriptionID, Description)\nSELECT [ProductDescriptionID], [Description]\nFROM [adventureworks_schema].[ProductDescription_Dim]\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[ProductDesc]\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
