@@ -1,5 +1,5 @@
 {
-	"name": "DimesionTrasformation",
+	"name": "DimensionTrasformation",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
