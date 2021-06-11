@@ -1,14 +1,13 @@
 {
-	"name": "DimLoaderAndTransformations",
+	"name": "FactLoader",
 	"properties": {
-		"description": "Run dataflow with Explicit copy to ingest copy source",
 		"activities": [
 			{
-				"name": "Trasformation",
+				"name": "FactLoader",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
-					"timeout": "7.00:00:00",
+					"timeout": "1.00:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
@@ -17,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DimesionTrasformation",
+						"referenceName": "DfFactLoader",
 						"type": "DataFlowReference"
 					},
 					"compute": {

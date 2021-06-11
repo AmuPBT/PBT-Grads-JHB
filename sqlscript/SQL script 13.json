@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 13",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[SalesOrderHeader]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[SalesOrderHeader]\n\t(\n\t [SalesOrderID] bigint,\n\t [RevisionNumber] bigint,\n\t [OrderDate] datetime2(0),\n\t [DueDate] datetime2(0),\n\t [ShipDate] datetime2(0),\n\t [Status] bigint,\n\t [OnlineOrderFlag] bit,\n\t [SalesOrderNumber] nvarchar(4000),\n\t [PurchaseOrderNumber] nvarchar(4000),\n\t [AccountNumber] bigint,\n\t [CustomerID] bigint,\n\t [ShipToAddressID] bigint,\n\t [BillToAddressID] bigint,\n\t [ShipMethod] nvarchar(4000),\n\t [CreditCardApprovalCode] nvarchar(4000),\n\t [SubTotal] float,\n\t [TaxAmt] float,\n\t [Freight] float,\n\t [TotalDue] float,\n\t [Comment] nvarchar(4000),\n\t [rowguid] uniqueidentifier,\n\t [ModifiedDateID] datetime2(0)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[SalesOrderHeader]\n--AS\n--BEGIN\nCOPY INTO [ext].[SalesOrderHeader]\n(SalesOrderID 1, RevisionNumber 2, OrderDate 3, DueDate 4, ShipDate 5, Status 6, OnlineOrderFlag 7, SalesOrderNumber 8, PurchaseOrderNumber 9, AccountNumber 10, CustomerID 11, ShipToAddressID 12, BillToAddressID 13, ShipMethod 14, CreditCardApprovalCode 15, SubTotal 16, TaxAmt 17, Freight 18, TotalDue 19, Comment 20, rowguid 21, ModifiedDateID 22)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderHeader'\nGO\n\nSELECT TOP 100 * FROM [ext].[SalesOrderHeader]\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
