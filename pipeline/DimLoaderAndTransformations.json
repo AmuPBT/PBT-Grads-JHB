@@ -4,7 +4,7 @@
 		"description": "Run dataflow with Explicit copy to ingest copy source",
 		"activities": [
 			{
-				"name": "Trasformation",
+				"name": "DimLoader",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
