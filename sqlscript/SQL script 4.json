@@ -2,7 +2,7 @@
 	"name": "SQL script 4",
 	"properties": {
 		"content": {
-			"query": "Alter table adventureworks_schema.Customer_Dim\nadd InsertedDateID Date",
+			"query": "SELECT *\n FROM [adventureworks_schema].[Address_Dim]\n WHERE AddressID = ",
 			"metadata": {
 				"language": "sql"
 			},
