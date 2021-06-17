@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 5",
+	"properties": {
+		"content": {
+			"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[Product]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [adventureworks_schema].[Product]\n\t(\n\t [ProductID] int,\n     [ModelName] nvarchar(4000),\n\t [ProductName] nvarchar(4000),\n     [Color] nvarchar(4000),\n\t [ProductNumber] nvarchar(4000),\n\t [ProductCategoryName] nvarchar(4000),\n     [Size] nvarchar(4000),\n     [ListPrice] float,\n\t [StandardCost] float,\n\t [Weight] float,\n     [SellEndDateID] datetime2(0),\n\t [SellStartDateID] datetime2(0),\n\t [DiscontinuedDateID] nvarchar(4000),\n     [ModifiedDateID] DATETIME2(0),\n     [DescriptionCultureAr] nvarchar(4000),\n     [DescriptionCultureEn] nvarchar(4000),\n     [DescriptionCultureFr] nvarchar(4000),\n     [DescriptionCultureHe] nvarchar(4000),\n     [DescriptionCultureTh] nvarchar(4000),\n     [DescriptionCultureZh-cht] nvarchar(4000),\n\t [InsertedDate]nvarchar(4000),\n     [HashKey] nvarchar(4000),\n     [Status] nvarchar(4000)\n\t \n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t HEAP\n\t)\nGO\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
