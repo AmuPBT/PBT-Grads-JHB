@@ -1,0 +1,3695 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "synapse-grad"
+		},
+		"ls_adl_adventureworks_lt_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_adl_adventureworks_lt'"
+		},
+		"ls_sqldb_adventureworks_lt_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_sqldb_adventureworks_lt'"
+		},
+		"ls_synapse_adventureworks_lt_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_synapse_adventureworks_lt'"
+		},
+		"synapse-grad-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'synapse-grad-WorkspaceDefaultSqlServer'"
+		},
+		"synapse-grad-jhb-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'synapse-grad-jhb-WorkspaceDefaultSqlServer'"
+		},
+		"ls_adl_adventureworks_lt_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlgen2grad.dfs.core.windows.net"
+		},
+		"synapse-grad-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlgen2grad.dfs.core.windows.net"
+		},
+		"synapse-grad-jhb-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlgen2gradjhb.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopySqlToAdl')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "@{item().source.schema}.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "dladventureworks//@{item().destination.fileName}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": true,
+										"stagingSettings": {
+											"linkedServiceName": {
+												"referenceName": "ls_adl_adventureworks_lt",
+												"type": "LinkedServiceReference"
+											},
+											"path": "dladventureworks"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_ffn",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_schema": "@item().source.schema",
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_ffn",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_fileName": "@item().destination.fileName"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"schema": "dbo",
+									"table": "BuildVersion"
+								},
+								"destination": {
+									"fileName": "dboBuildVersion.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "dbo",
+									"table": "ErrorLog"
+								},
+								"destination": {
+									"fileName": "dboErrorLog.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "Address"
+								},
+								"destination": {
+									"fileName": "SalesLTAddress.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "Customer"
+								},
+								"destination": {
+									"fileName": "SalesLTCustomer.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "CustomerAddress"
+								},
+								"destination": {
+									"fileName": "SalesLTCustomerAddress.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "Product"
+								},
+								"destination": {
+									"fileName": "SalesLTProduct.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductCategory"
+								},
+								"destination": {
+									"fileName": "SalesLTProductCategory.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductDescription"
+								},
+								"destination": {
+									"fileName": "SalesLTProductDescription.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductModel"
+								},
+								"destination": {
+									"fileName": "SalesLTProductModel.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductModelProductDescription"
+								},
+								"destination": {
+									"fileName": "SalesLTProductModelProductDescription.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "SalesOrderDetail"
+								},
+								"destination": {
+									"fileName": "SalesLTSalesOrderDetail.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "SalesOrderHeader"
+								},
+								"destination": {
+									"fileName": "SalesLTSalesOrderHeader.txt"
+								}
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/SourceDataset_ffn')]",
+				"[concat(variables('workspaceId'), '/datasets/DestinationDataset_ffn')]",
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimLoaderAndTransformations')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Run dataflow with Explicit copy to ingest copy source",
+				"activities": [
+					{
+						"name": "DimLoader",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DimensionTrasformation",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Product": {},
+									"ProductCategory": {},
+									"ProductDescription": {},
+									"ProductModel": {},
+									"ProductModelProductDescription": {},
+									"Address": {},
+									"Customer": {},
+									"DimCustomer": {},
+									"DimAddress": {},
+									"SinkProductDimension": {},
+									"Sink": {},
+									"sink1": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "ls_adl_adventureworks_lt",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "synapse/stagingFolder"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/DimensionTrasformation')]",
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]",
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/FactLoader')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "FactLoader",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DfFactLoader",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Date": {},
+									"Customer": {},
+									"SOH": {},
+									"SOD": {},
+									"Product": {},
+									"sinkSOH": {},
+									"sinkSOD": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/DfFactLoader')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Address')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "Address"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AddressDimension')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime2",
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Address_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapse-grad-jhb-WorkspaceDefaultSqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AddressDimensions')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "HashKey",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Address_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapse-grad-jhb-WorkspaceDefaultSqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSqlDatabaseDataSource')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Connection to your data source store.",
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": ""
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Customer')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "NameStyle",
+						"type": "bit"
+					},
+					{
+						"name": "Title",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FirstName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Suffix",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CompanyName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Phone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "varchar"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "varchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "Customer"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CustomerAddress')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressType",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "CustomerAddress"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CustomerDimension')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "Title",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FirstName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "MiddleName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "LastName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Suffix",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CompanyName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "SalesPerson",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Phone",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PasswordHash",
+						"type": "varchar"
+					},
+					{
+						"name": "PasswordSalt",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "HashKey",
+						"type": "char"
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Customer_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DataDestination')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Connection to your data destination store.",
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Data_Destination_Container": {
+						"type": "String"
+					},
+					"Data_Destination_Directory": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@{dataset().Data_Destination_Directory}",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@{dataset().Data_Destination_Container}",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DateDimension')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "DateID",
+						"type": "date"
+					},
+					{
+						"name": "Date",
+						"type": "date"
+					},
+					{
+						"name": "Day",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Month",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Year",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Date_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DestinationDataset_ffn')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_fileName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().cw_fileName",
+							"type": "Expression"
+						},
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DestinationDataset_yih')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_fileName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().cw_fileName",
+							"type": "Expression"
+						},
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimAddressSource')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DBName": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime2",
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Address_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapse-grad-jhb-WorkspaceDefaultSqlServer')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimensionProduct')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ModelName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Color",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductCategoryName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Size",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ListPrice",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "StandardCost",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "Weight",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SellEndDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "SellStartDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DiscontinuedDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DescriptionCultureAr",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureEn",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureFr",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureHe",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureTh",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureZh-cht",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Product_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Product')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Color",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StandardCost",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "ListPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Size",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Weight",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "ProductCategoryID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductModelID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SellStartDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "SellEndDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DiscontinuedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ThumbNailPhoto",
+						"type": "varbinary"
+					},
+					{
+						"name": "ThumbnailPhotoFileName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "Product"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ProductCategory')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductCategoryID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ParentProductCategoryID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "ProductCategory"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ProductDescription')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductDescriptionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Description",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "ProductDescription"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ProductDim')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ModelName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Color",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductCategoryName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Size",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ListPrice",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "StandardCost",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "Weight",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 2
+					},
+					{
+						"name": "SellEndDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "SellStartDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DiscontinuedDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DescriptionCultureAr",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureEn",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureFr",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureHe",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureTh",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureZh-cht",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Product_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ProductModel')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductModelID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CatalogDescription",
+						"type": "xml"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "ProductModel"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ProductModelProductDescription')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ProductModelID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductDescriptionID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Culture",
+						"type": "nchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "ProductModelProductDescription"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SOD')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTSalesOrderDetail",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTAddress')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTAddress",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTCustomer')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTCustomer",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTProduct')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTProduct",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTProductCategory')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTProductCategory",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTProductDesc')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTProductDescription",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTProductModel')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTProductModel",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTProductModelProductDesc')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTProductModelProductDescription",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTSOD')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTSalesOrderDetail",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesLTSOH')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTSalesOrderHeader",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesOrderDetail')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderDetailID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "UnitPriceDiscount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "LineTotal",
+						"type": "decimal",
+						"precision": 38,
+						"scale": 6
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "SalesOrderDetail"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesOrderDetailFact')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderDetailID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ModifiedDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "UnitPriceDiscount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "LineTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "SalesOrderDetail_Fact"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesOrderHeader')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RevisionNumber",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OrderDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "DueDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ShipDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SalesOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PurchaseOrderNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AccountNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipMethod",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreditCardApprovalCode",
+						"type": "varchar"
+					},
+					{
+						"name": "SubTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Freight",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalDue",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Comment",
+						"type": "nvarchar"
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "SalesOrderHeader"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SalesOrderHeaderFact')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderDateID",
+						"type": "date"
+					},
+					{
+						"name": "DueDateID",
+						"type": "date"
+					},
+					{
+						"name": "ShipDateID",
+						"type": "date"
+					},
+					{
+						"name": "ModifiedDateID",
+						"type": "date"
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SubTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Freight",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalDue",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "SalesOrderHeader_Fact"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SinkAddress')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime2",
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Address_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SourceDataset')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Connection to your source data store.",
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					},
+					"SourceContainer": {
+						"type": "string"
+					},
+					"SourceDirectory": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().SourceDirectory",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().SourceContainer",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SourceDataset_ffn')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_schema": {
+						"type": "String"
+					},
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().cw_schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SourceDataset_yih')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_schema": {
+						"type": "String"
+					},
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().cw_schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PowerBI_workspace_grad_JHB')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "PowerBIWorkspace",
+				"typeProperties": {
+					"workspaceID": "9263ac14-5e7a-4e15-9c4a-2981e1d4d6b3",
+					"tenantID": "16e79c95-57c1-497d-bd45-06210b204f16"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_adl_adventureworks_lt')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_adl_adventureworks_lt_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ls_adl_adventureworks_lt_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_sqldb_adventureworks_lt')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_sqldb_adventureworks_lt_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntimegrad",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/integrationRuntimegrad')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_synapse_adventureworks_lt')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"adventureworks_schema": {
+						"type": "string",
+						"defaultValue": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_synapse_adventureworks_lt_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/synapse-grad-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('synapse-grad-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/synapse-grad-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('synapse-grad-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/synapse-grad-jhb-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('synapse-grad-jhb-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/synapse-grad-jhb-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('synapse-grad-jhb-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimLoaderTrigger')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "DimLoaderAndTransformations",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 5,
+						"startTime": "2021-06-11T21:33:00",
+						"endTime": "2021-06-11T22:33:00",
+						"timeZone": "GMT Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/DimLoaderAndTransformations')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/IntegrationRuntime1')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 16,
+							"timeToLive": 0,
+							"cleanup": true
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/IntegrationRuntimeSH')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/integrationRuntimegrad')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DfFactLoader')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "DateDimension",
+								"type": "DatasetReference"
+							},
+							"name": "Date"
+						},
+						{
+							"dataset": {
+								"referenceName": "CustomerDimension",
+								"type": "DatasetReference"
+							},
+							"name": "Customer"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTSOH",
+								"type": "DatasetReference"
+							},
+							"name": "SOH"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTSOD",
+								"type": "DatasetReference"
+							},
+							"name": "SOD"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimensionProduct",
+								"type": "DatasetReference"
+							},
+							"name": "Product"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SalesOrderHeaderFact",
+								"type": "DatasetReference"
+							},
+							"name": "sinkSOH"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesOrderDetailFact",
+								"type": "DatasetReference"
+							},
+							"name": "sinkSOD"
+						}
+					],
+					"transformations": [
+						{
+							"name": "JoinOrderDate"
+						},
+						{
+							"name": "JoinCustomer"
+						},
+						{
+							"name": "SelectSOH"
+						},
+						{
+							"name": "JoinDueDate"
+						},
+						{
+							"name": "SelectSOH1"
+						},
+						{
+							"name": "JoinShipDate"
+						},
+						{
+							"name": "SelectSOH2"
+						},
+						{
+							"name": "JoinModifiedDate"
+						},
+						{
+							"name": "SelectSOH3"
+						},
+						{
+							"name": "JoinProduct"
+						},
+						{
+							"name": "JoinDate"
+						},
+						{
+							"name": "SelectSOD"
+						}
+					],
+					"script": "source(output(\n\t\tDateID as date,\n\t\tDate as date,\n\t\tDay as string,\n\t\tMonth as string,\n\t\tYear as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Date\nsource(output(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Customer\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as short,\n\t\tOrderDate as date,\n\t\tDueDate as date,\n\t\tShipDate as date,\n\t\tStatus as short,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipMethod as string,\n\t\tCreditCardApprovalCode as string,\n\t\tSubTotal as double,\n\t\tTaxAmt as double,\n\t\tFreight as double,\n\t\tTotalDue as double,\n\t\tComment as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SOH\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tOrderQty as short,\n\t\tProductID as integer,\n\t\tUnitPrice as double,\n\t\tUnitPriceDiscount as double,\n\t\tLineTotal as double,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SOD\nsource(output(\n\t\tProductID as integer,\n\t\tModelName as string,\n\t\tProductName as string,\n\t\tColor as string,\n\t\tProductNumber as string,\n\t\tProductCategoryName as string,\n\t\tSize as string,\n\t\tListPrice as decimal(8,2),\n\t\tStandardCost as decimal(8,2),\n\t\tWeight as decimal(8,2),\n\t\tSellEndDateID as timestamp,\n\t\tSellStartDateID as timestamp,\n\t\tDiscontinuedDateID as timestamp,\n\t\tModifiedDateID as timestamp,\n\t\tDescriptionCultureAr as string,\n\t\tDescriptionCultureEn as string,\n\t\tDescriptionCultureFr as string,\n\t\tDescriptionCultureHe as string,\n\t\tDescriptionCultureTh as string,\n\t\t{DescriptionCultureZh-cht} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Product\nSOH, Date join(OrderDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinOrderDate\nJoinOrderDate, Customer join(SOH@CustomerID == Customer@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinCustomer\nJoinCustomer select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID = DateID,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID = Customer@CustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate = SOH@ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH\nSelectSOH, Date join(DueDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinDueDate\nJoinDueDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID = DateID,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH1\nSelectSOH1, Date join(ShipDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinShipDate\nJoinShipDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID = DateID,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH2\nSelectSOH2, Date join(ModifiedDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinModifiedDate\nJoinModifiedDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDateID = DateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH3\nSOD, Product join(SOD@ProductID == Product@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinProduct\nJoinProduct, Date join(ModifiedDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinDate\nJoinDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tSalesOrderDetailID,\n\t\tOrderQty,\n\t\tProductID = Product@ProductID,\n\t\tUnitPrice,\n\t\tUnitPriceDiscount,\n\t\tLineTotal,\n\t\trowguid,\n\t\tModifiedDateID = DateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOD\nSelectSOH3 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSalesOrderID as integer,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tOrderDateID as date,\n\t\tDueDateID as date,\n\t\tShipDateID as date,\n\t\tModifiedDateID as date,\n\t\tOnlineOrderFlag as boolean,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4)\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tSalesOrderID,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID,\n\t\tModifiedDateID,\n\t\tOnlineOrderFlag,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue\n\t)) ~> sinkSOH\nSelectSOD sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tModifiedDateID as timestamp,\n\t\tOrderQty as integer,\n\t\tProductID as integer,\n\t\tUnitPrice as decimal(19,4),\n\t\tUnitPriceDiscount as decimal(19,4),\n\t\tLineTotal as decimal(19,4)\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSOD"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/DateDimension')]",
+				"[concat(variables('workspaceId'), '/datasets/CustomerDimension')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTSOH')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTSOD')]",
+				"[concat(variables('workspaceId'), '/datasets/DimensionProduct')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesOrderHeaderFact')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesOrderDetailFact')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimensionTrasformation')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SalesLTProduct",
+								"type": "DatasetReference"
+							},
+							"name": "Product"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTProductCategory",
+								"type": "DatasetReference"
+							},
+							"name": "ProductCategory"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTProductDesc",
+								"type": "DatasetReference"
+							},
+							"name": "ProductDescription"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTProductModel",
+								"type": "DatasetReference"
+							},
+							"name": "ProductModel"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTProductModelProductDesc",
+								"type": "DatasetReference"
+							},
+							"name": "ProductModelProductDescription"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTAddress",
+								"type": "DatasetReference"
+							},
+							"name": "Address"
+						},
+						{
+							"dataset": {
+								"referenceName": "SalesLTCustomer",
+								"type": "DatasetReference"
+							},
+							"name": "Customer"
+						},
+						{
+							"dataset": {
+								"referenceName": "CustomerDimension",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomer"
+						},
+						{
+							"dataset": {
+								"referenceName": "AddressDimensions",
+								"type": "DatasetReference"
+							},
+							"name": "DimAddress"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimensionProduct",
+								"type": "DatasetReference"
+							},
+							"name": "SinkProductDimension"
+						},
+						{
+							"dataset": {
+								"referenceName": "CustomerDimension",
+								"type": "DatasetReference"
+							},
+							"name": "Sink"
+						},
+						{
+							"dataset": {
+								"referenceName": "AddressDimensions",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "JoinProdDescandProdModProdDesc"
+						},
+						{
+							"name": "JoinProdandProdCat"
+						},
+						{
+							"name": "JoinProdModandProdProdCat"
+						},
+						{
+							"name": "JoinProduct"
+						},
+						{
+							"name": "SelectProduct"
+						},
+						{
+							"name": "PivotProduct"
+						},
+						{
+							"name": "MapDriftProduct",
+							"description": "Creates an explicit mapping for each drifted column"
+						},
+						{
+							"name": "JoinProduct1"
+						},
+						{
+							"name": "AggProdDesc"
+						},
+						{
+							"name": "JoinProduct2"
+						},
+						{
+							"name": "SelectProduct2"
+						},
+						{
+							"name": "AggProduct"
+						},
+						{
+							"name": "SelectCustomer"
+						},
+						{
+							"name": "CreateCustomerHash"
+						},
+						{
+							"name": "Exists"
+						},
+						{
+							"name": "LookupCustomerID"
+						},
+						{
+							"name": "SetDates"
+						},
+						{
+							"name": "AllowUpserts"
+						},
+						{
+							"name": "CreateAddressHash"
+						},
+						{
+							"name": "SelectAddress"
+						},
+						{
+							"name": "LookupAddressID"
+						},
+						{
+							"name": "Exists1"
+						},
+						{
+							"name": "SetDatesAddress"
+						},
+						{
+							"name": "AllowUpsert"
+						}
+					],
+					"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as double,\n\t\tListPrice as double,\n\t\tSize as string,\n\t\tWeight as double,\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as date,\n\t\tSellEndDate as date,\n\t\tDiscontinuedDate as date,\n\t\tThumbNailPhoto as string,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Product\nsource(output(\n\t\tProductCategoryID as integer,\n\t\tParentProductCategoryID as integer,\n\t\tName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductCategory\nsource(output(\n\t\tProductDescriptionID as integer,\n\t\tDescription as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductDescription\nsource(output(\n\t\tProductModelID as integer,\n\t\tName as string,\n\t\tCatalogDescription as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductModel\nsource(output(\n\t\tProductModelID as integer,\n\t\tProductDescriptionID as integer,\n\t\tCulture as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductModelProductDescription\nsource(output(\n\t\tColumn_1 as integer,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Address\nsource(output(\n\t\tColumn_1 as integer,\n\t\tColumn_2 as boolean,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string,\n\t\tColumn_10 as string,\n\t\tColumn_11 as string,\n\t\tColumn_12 as string,\n\t\tColumn_13 as string,\n\t\tColumn_14 as string,\n\t\tColumn_15 as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Customer\nsource(output(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCustomer\nsource(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimAddress\nProductModelProductDescription, ProductDescription join(ProductModelProductDescription@ProductDescriptionID == ProductDescription@ProductDescriptionID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdDescandProdModProdDesc\nProduct, ProductCategory join(Product@ProductCategoryID == ProductCategory@ProductCategoryID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdandProdCat\nProductModel, JoinProdandProdCat join(ProductModel@ProductModelID == Product@ProductModelID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdModandProdProdCat\nJoinProdModandProdProdCat, JoinProdDescandProdModProdDesc join(ProductModel@ProductModelID == ProductModelProductDescription@ProductModelID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProduct\nJoinProduct select(mapColumn(\n\t\tProductModelID = ProductModel@ProductModelID,\n\t\tProductDescriptionID = ProductDescription@ProductDescriptionID,\n\t\tProductCategoryID = Product@ProductCategoryID,\n\t\tProductID,\n\t\tProductModelID = ProductModel@ProductModelID,\n\t\tModelName = ProductModel@Name,\n\t\tCatalogDescription,\n\t\tProductName = Product@Name,\n\t\tProductNumber,\n\t\tColor,\n\t\tStandardCost,\n\t\tListPrice,\n\t\tSize,\n\t\tWeight,\n\t\tSellStartDateID = SellStartDate,\n\t\tSellEndDateID = SellEndDate,\n\t\tDiscontinuedDateID = DiscontinuedDate,\n\t\tModifiedDateID = Product@ModifiedDate,\n\t\tProductCategoryName = ProductCategory@Name,\n\t\tCulture,\n\t\tDescription\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProduct\nSelectProduct pivot(groupBy(Description),\n\tpivotBy(Culture),\n\tDescriptionCulture = max(Description),\n\tcolumnNaming: '$N$V',\n\tlateral: false) ~> PivotProduct\nPivotProduct derive(DescriptionCultureAr = toString(byName('DescriptionCulturear    ')),\n\t\tDescriptionCultureEn = toString(byName('DescriptionCultureen    ')),\n\t\tDescriptionCultureFr = toString(byName('DescriptionCulturefr    ')),\n\t\tDescriptionCultureHe = toString(byName('DescriptionCulturehe    ')),\n\t\tDescriptionCultureTh = toString(byName('DescriptionCultureth    ')),\n\t\t{DescriptionCultureZh-cht} = toString(byName('DescriptionCulturezh-cht'))) ~> MapDriftProduct\nMapDriftProduct, SelectProduct join(PivotProduct@Description == SelectProduct@Description,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProduct1\nJoinProduct1 aggregate(groupBy(ProductID),\n\tDescriptionCultureAr = max(DescriptionCultureAr),\n\t\t{DescriptionCultureEn    } = max(DescriptionCultureEn),\n\t\t{DescriptionCultureFr   } = max(DescriptionCultureFr),\n\t\tDescriptionCultureHe = max(DescriptionCultureHe),\n\t\tDescriptionCultureTh = max(DescriptionCultureTh),\n\t\t{DescriptionCultureZh-cht} = max({DescriptionCultureZh-cht})) ~> AggProdDesc\nAggProdDesc, SelectProduct join(AggProdDesc@ProductID == SelectProduct@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinProduct2\nJoinProduct2 select(mapColumn(\n\t\tProductID = SelectProduct@ProductID,\n\t\tProductModelID,\n\t\tProductDescriptionID,\n\t\tDescriptionCultureAr,\n\t\t{DescriptionCultureEn    },\n\t\t{DescriptionCultureFr   },\n\t\tDescriptionCultureHe,\n\t\tDescriptionCultureTh,\n\t\t{DescriptionCultureZh-cht},\n\t\tProductCategoryID,\n\t\tModelName,\n\t\tProductName,\n\t\tProductCategoryName,\n\t\tProductNumber,\n\t\tColor,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellStartDateID,\n\t\tSellEndDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProduct2\nSelectProduct2 aggregate(groupBy(ProductID,\n\t\tProductModelID,\n\t\tProductCategoryID,\n\t\tModelName,\n\t\tProductName,\n\t\tColor,\n\t\tProductNumber,\n\t\tProductCategoryName,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellEndDateID,\n\t\tSellStartDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID),\n\tDescriptionCultureAr = max(DescriptionCultureAr),\n\t\t{DescriptionCultureEn    } = max({DescriptionCultureEn    }),\n\t\t{DescriptionCultureFr    } = max({DescriptionCultureFr   }),\n\t\tDescriptionCultureHe = max(DescriptionCultureHe),\n\t\tDescriptionCultureTh = max(DescriptionCultureTh),\n\t\t{DescriptionCultureZh-cht} = max({DescriptionCultureZh-cht})) ~> AggProduct\nCustomer select(mapColumn(\n\t\tCustomerID = Column_1,\n\t\tNameStyle = Column_2,\n\t\tTitle = Column_3,\n\t\tFirstName = Column_4,\n\t\tMiddleName = Column_5,\n\t\tLastName = Column_6,\n\t\tSuffix = Column_7,\n\t\tCompanyName = Column_8,\n\t\tSalesPerson = Column_9,\n\t\tEmailAddress = Column_10,\n\t\tPhone = Column_11,\n\t\tPasswordHash = Column_12,\n\t\tPasswordSalt = Column_13,\n\t\tModifiedDate = Column_14\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCustomer\nSelectCustomer derive(HashKey = sha2(256, iifNull(Title,'') +FirstName +iifNull(MiddleName,'') +LastName +iifNull(Suffix,'') +iifNull(CompanyName,'') +iifNull(SalesPerson,'') +iifNull(EmailAddress,'') +iifNull(Phone,''))) ~> CreateCustomerHash\nCreateCustomerHash, DimCustomer exists(CreateCustomerHash@HashKey == DimCustomer@HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists, DimCustomer lookup(SelectCustomer@CustomerID == DimCustomer@CustomerID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCustomerID\nLookupCustomerID derive(ModifiedDate = currentTimestamp()) ~> SetDates\nSetDates alterRow(upsertIf(true())) ~> AllowUpserts\nSelectAddress derive(HashKey = sha2(256,AddressLine1 +iifNull(AddressLine2,'') +iifNull(City,'') +iifNull(StateProvince,'') +iifNull(CountryRegion,'') +iifNull(PostalCode,''))) ~> CreateAddressHash\nAddress select(mapColumn(\n\t\tAddressID = Column_1,\n\t\tAddressLine1 = Column_2,\n\t\tAddressLine2 = Column_3,\n\t\tCity = Column_4,\n\t\tStateProvince = Column_5,\n\t\tCountryRegion = Column_6,\n\t\tPostalCode = Column_7,\n\t\tModifiedDate = Column_8\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAddress\nExists1, DimAddress lookup(SelectAddress@AddressID == DimAddress@AddressID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAddressID\nCreateAddressHash, DimAddress exists(CreateAddressHash@HashKey == DimAddress@HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nLookupAddressID derive(ModifiedDate = currentTimestamp()) ~> SetDatesAddress\nSetDatesAddress alterRow(insertIf(true())) ~> AllowUpsert\nAggProduct sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tProductID as integer,\n\t\tModelName as string,\n\t\tProductName as string,\n\t\tColor as string,\n\t\tProductNumber as string,\n\t\tProductCategoryName as string,\n\t\tSize as string,\n\t\tListPrice as decimal(8,2),\n\t\tStandardCost as decimal(8,2),\n\t\tWeight as decimal(8,2),\n\t\tSellEndDateID as timestamp,\n\t\tSellStartDateID as timestamp,\n\t\tDiscontinuedDateID as timestamp,\n\t\tModifiedDateID as timestamp,\n\t\tDescriptionCultureAr as string,\n\t\tDescriptionCultureEn as string,\n\t\tDescriptionCultureFr as string,\n\t\tDescriptionCultureHe as string,\n\t\tDescriptionCultureTh as string,\n\t\t{DescriptionCultureZh-cht} as string\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tProductID,\n\t\tModelName,\n\t\tProductName,\n\t\tColor,\n\t\tProductNumber,\n\t\tProductCategoryName,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellEndDateID,\n\t\tSellStartDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID,\n\t\tDescriptionCultureAr,\n\t\tDescriptionCultureEn = {DescriptionCultureEn    },\n\t\tDescriptionCultureFr = {DescriptionCultureFr    },\n\t\tDescriptionCultureHe,\n\t\tDescriptionCultureTh,\n\t\t{DescriptionCultureZh-cht}\n\t)) ~> SinkProductDimension\nAllowUpserts sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['CustomerID'],\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tCustomerID = SelectCustomer@CustomerID,\n\t\tTitle = SelectCustomer@Title,\n\t\tFirstName = SelectCustomer@FirstName,\n\t\tMiddleName = SelectCustomer@MiddleName,\n\t\tLastName = SelectCustomer@LastName,\n\t\tSuffix = SelectCustomer@Suffix,\n\t\tCompanyName = SelectCustomer@CompanyName,\n\t\tSalesPerson = SelectCustomer@SalesPerson,\n\t\tEmailAddress = SelectCustomer@EmailAddress,\n\t\tPhone = SelectCustomer@Phone,\n\t\tPasswordHash = SelectCustomer@PasswordHash,\n\t\tPasswordSalt = SelectCustomer@PasswordSalt,\n\t\tModifiedDate,\n\t\tHashKey = CreateCustomerHash@HashKey\n\t)) ~> Sink\nAllowUpsert sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['AddressID'],\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tAddressID = SelectAddress@AddressID,\n\t\tAddressLine1 = SelectAddress@AddressLine1,\n\t\tAddressLine2 = SelectAddress@AddressLine2,\n\t\tCity = SelectAddress@City,\n\t\tStateProvince = SelectAddress@StateProvince,\n\t\tCountryRegion = SelectAddress@CountryRegion,\n\t\tPostalCode = SelectAddress@PostalCode,\n\t\tModifiedDate,\n\t\tHashKey = CreateAddressHash@HashKey\n\t)) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/SalesLTProduct')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTProductCategory')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTProductDesc')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTProductModel')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTProductModelProductDesc')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTAddress')]",
+				"[concat(variables('workspaceId'), '/datasets/SalesLTCustomer')]",
+				"[concat(variables('workspaceId'), '/datasets/CustomerDimension')]",
+				"[concat(variables('workspaceId'), '/datasets/AddressDimensions')]",
+				"[concat(variables('workspaceId'), '/datasets/DimensionProduct')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AddDataToCustomerTable')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'Customer_Dim' AND O.TYPE = 'U' AND S.NAME = 'adventureworks_schema')\nCREATE TABLE adventureworks_schema.Customer_Dim\n\t(\n\t [CustomerID] bigint,\n\t [Title] nvarchar(8),\n\t [FirstName] nvarchar(50),\n\t [MiddleName] nvarchar(50),\n\t [LastName] nvarchar(50),\n\t [Suffix] nvarchar(10),\n\t [CompanyName] nvarchar(128),\n\t [SalesPerson] nvarchar(256),\n\t [EmailAddress] nvarchar(50),\n\t [Phone] nvarchar(25),\n\t [PasswordHash] varchar(128),\n\t [PasswordSalt] varchar(10),\n\t [ModifiedDate] datetime2(0)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t)\nGO\n\nCOPY INTO adventureworks_schema.Customer_Dim\n(CustomerID 1, Title 3, FirstName 4, MiddleName 5, LastName 6, Suffix 7, CompanyName 8, SalesPerson 9, EmailAddress 10, Phone 11, PasswordHash 12, PasswordSalt 13, ModifiedDate 15)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTCustomer'\n\n\nSELECT TOP 100 * FROM adventureworks_schema.Customer_Dim\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AddDataToDateDim')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "TRUNCATE TABLE adventureworks_schema.Date_Dim\n\nDECLARE @CurrentDate DATE = '2010-05-01'\nDECLARE @EndDate DATE = '2020-12-31'\n\nWHILE @CurrentDate < @EndDate\nBEGIN\nINSERT INTO [adventureworks_schema].[Date_Dim](\n[DateID]\n,[Date]\n,[Day]\n,[Month]\n,[Quarter]\n,[Year]\n)\nSELECT [DateID] = @CurrentDate,\n[Date] = @CurrentDate,\n[Day] = DAY(@CurrentDate),\n[Month] = MONTH(@CurrentDate),\n[Quarter] = DATEPART(q, @CurrentDate),\n[Year] = YEAR(@CurrentDate)\nSET @CurrentDate = DATEADD(DD, 1, @CurrentDate)\nEND\n\nSELECT * from adventureworks_schema.Date_Dim\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AddDataToProdCat')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[ProductCategory_Dim]' AND O.TYPE = 'U' AND S.NAME = '[adventureworks_schema]')\nCREATE TABLE [adventureworks_schema].[ProductCategory_Dim]\n\t(\n\t [ProductCategoryID] int,\n\t [ParentProductCategoryID] int,\n\t [Name] nvarchar(50),\n\t [ModifiedDate] datetime\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[ProductCategory_Dim]\n--AS\n--BEGIN\nCOPY INTO [adventureworks_schema].[ProductCategory_Dim]\n(ProductCategoryID 1, ParentProductCategoryID 2, Name 3, ModifiedDate 5)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTProductCategory'\nGO\n\nSELECT TOP 100 * FROM [adventureworks_schema].[ProductCategory_Dim]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyProdCatDim')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "COPY INTO adventureworks_schema.ProductCategory_Dim\n(ProductCategoryID 1, ParentProductCategoryID 2, Name 3, ModifiedDate 5)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTProductCategory'\n\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.ProductCategory_Dim\nGO\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyProductDescription')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "COPY INTO adventureworks_schema.ProductDescription_Dim\n(ProductDescriptionID 1, Description 2, ModifiedDate 4)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTProductDescription'\nGO\n\nSELECT * from adventureworks_schema.ProductDescription_Dim",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopySOHFact')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "COPY INTO adventureworks_schema.SalesOrderHeader_Fact\n(SalesOrderID 1, CustomerID 11, ShipToAddressID 12, BillToAddressID 13, OrderDateID 3, DueDateID 4, \nShipDateID 5, ModifiedDateID 22, OnlineOrderFlag 7, SubTotal 16, TaxAmt 17, Freight 18, TotalDue 19)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderHeader'\n\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.SalesOrderHeader_Fact\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyToSODFact')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "COPY INTO adventureworks_schema.SalesOrderDetail_Fact\n(SalesOrderID 1, SalesOrderDetailID 2, ModifiedDateID 9, OrderQty 3, ProductID 4, UnitPrice 5, UnitPriceDiscount 6, LineTotal 7)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderDetail'\nGO\n\nSELECT TOP 100 * FROM adventureworks_schema.SalesOrderDetail_Fact\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateAndCopySOHFact')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[SalesOrderHeader_Fact]' AND O.TYPE = 'U' AND S.NAME = '[adventureworks_schema]')\nCREATE TABLE [adventureworks_schema].[SalesOrderHeader_Fact]\n\t(\n\t [SalesOrderID] int,\n\t [CustomerID] int,\n\t [ShipToAddressID] int,\n\t [BillToAddressID] int,\n\t [OrderDateID] date,\n\t [DueDateID] date,\n\t [ShipDateID] date,\n\t [ModifiedDateID] date,\n\t [OnlineOrderFlag] bit,\n\t [SubTotal] MONEY,\n\t [TaxAmt] MONEY,\n\t [Freight] MONEY,\n\t [TotalDue] MONEY\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\nCOPY INTO [adventureworks_schema].[SalesOrderHeader_Fact]\n(SalesOrderID 1, CustomerID 11, ShipToAddressID 12, BillToAddressID 13, OrderDateID 3, DueDateID 4, ShipDateID 5, ModifiedDateID 22, OnlineOrderFlag 7, SubTotal 16, TaxAmt 17, Freight 18, TotalDue 19)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTSalesOrderHeader'\nGO\n\nSELECT * FROM [adventureworks_schema].[SalesOrderHeader_Fact]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateDateDimension')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "DROP TABLE [adventureworks_schema].[Date_Dim]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[Date_Dim]\n( \n\t[DateID] [date]  NOT NULL,\n\t[Date] [date]  NOT NULL,\n\t[Day] NVARCHAR(10)  NOT NULL,\n\t[Month] NVARCHAR(10) NOT NULL,\n\t[Year] int  NOT NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateExtProdMod')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[ProductMod]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[ProductMod]\n\t(\n\t [ProductModelID] int,\n\t [ProductModelName] nvarchar(4000)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[Product]\n--AS\n--BEGIN\nCOPY INTO [ext].[ProductMod]\n(ProductModelID 1, ProductModelName 2)\nFROM 'https://adlgen2gradjhb.blob.core.windows.net/dladventureworks/datalake/SalesLTProductModel'\n\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[ProductMod]\nGO\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateExtProdModProdDesc')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[ProductModelProductDescription]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[ProductModelProductDescription]\n\t(\n\t [ProductModelID] bigint,\n\t [ProductDescriptionID] bigint,\n\t [Culture] nvarchar(4000)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[ProductModelProductDescription]\n--AS\n--BEGIN\nCOPY INTO [ext].[ProductModelProductDescription]\n(ProductModelID 1, ProductDescriptionID 2, Culture 3)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTProductModelProductDescription'\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[ProductModelProductDescription]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateExtProduct')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[Product]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[Product]\n\t(\n\t [ProductID] int,\n\t [ProductName] nvarchar(4000),\n\t [ProductNumber] nvarchar(4000),\n\t [Color] nvarchar(4000),\n\t [StandardCost] float,\n\t [ListPrice] float,\n\t [Size] nvarchar(4000),\n\t [Weight] float,\n\t [ProductCategoryID] int,\n\t [ProductModelID] int,\n\t [SellStartDateID] datetime2(0),\n\t [SellEndDateID] datetime2(0),\n\t [DiscontinuedDateID] nvarchar(4000),\n\t [ThumbnailPhotoFileName] nvarchar(4000),\n\t [ModifiedDateID] DATETIME2(0)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[Product]\n--AS\n--BEGIN\nCOPY INTO [ext].[Product]\n(ProductID 1, ProductName 2, ProductNumber 3, Color 4, StandardCost 5, ListPrice 6, Size 7, Weight 8, ProductCategoryID 9, ProductModelID 10, SellStartDateID 11, SellEndDateID 12, DiscontinuedDateID 13, ThumbnailPhotoFileName 15, ModifiedDateID 17)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTProduct'\n\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[Product]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateExternalAddress')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[Dimension_Address]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[Dimension_Address]\n\t(\n\t [AddressID] int,\n\t [AddressLine1] nvarchar(4000),\n\t [AddressLine2] nvarchar(4000),\n\t [City] nvarchar(4000),\n\t [StateProvince] nvarchar(4000),\n\t [CountryRegion] nvarchar(4000),\n\t [PostalCode] nvarchar(4000),\n\t [ModifiedDate] datetime2(0)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- CLUSTERED COLUMNSTORE INDEX\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[Address]\n--AS\n--BEGIN\nCOPY INTO [ext].[Dimension_Address]\n(AddressID 1, AddressLine1 2, AddressLine2 3, City 4, StateProvince 5, CountryRegion 6, PostalCode 7, ModifiedDate 9)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTAddress'\n\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[Dimension_Address]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateExternalCustomer')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[Dimension_Customer]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[Dimension_Customer]\n\t(\n\t [CustomerID] [bigint]  NULL,\n\t[Title] [nvarchar](8)  NULL,\n\t[FirstName] [nvarchar](50)  NULL,\n\t[MiddleName] [nvarchar](50)  NULL,\n\t[LastName] [nvarchar](50)  NULL,\n\t[Suffix] [nvarchar](10)  NULL,\n\t[CompanyName] [nvarchar](128)  NULL,\n\t[SalesPerson] [nvarchar](256)  NULL,\n\t[EmailAddress] [nvarchar](50)  NULL,\n\t[Phone] [nvarchar](25)  NULL,\n\t[PasswordHash] [varchar](128)  NULL,\n\t[PasswordSalt] [varchar](10)  NULL,\n\t[ModifiedDateID] [datetime2](0)  NULL\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[Dimension_Customer]\n--AS\n--BEGIN\nCOPY INTO [ext].[Dimension_Customer]\n(CustomerID 1, Title 3, FirstName 4, MiddleName 5, LastName 6, Suffix 7, CompanyName 8, SalesPerson 9, EmailAddress 10, Phone 11, PasswordHash 12, PasswordSalt 13, ModifiedDateID 15)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLTCustomer'\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[Dimension_Customer]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateSODFact')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE TABLE [adventureworks_schema].[SalesOrderDetail_Fact]\n(\n    [SalesOrderID]\tint\tNOT NULL,\n    [SalesOrderDetailID]\tint\tNOT NULL,\n    [OrderQty]\tsmallint NOT NULL,\n    [ProductID]\tint\tNOT NULL,\n    [UnitPrice]\tmoney NOT NULL,\t\n    [UnitPriceDiscount]\tmoney\tNOT NULL,\n    [LineTotal] MONEY\tNOT NULL,\t\n    [ModifiedDate]\tdatetime NOT NULL\n)\nWITH\n(\n    DISTRIBUTION = ROUND_ROBIN,\n    CLUSTERED COLUMNSTORE INDEX\n);\nCOPY INTO [adventureworks_schema].[SalesOrderDetail_Fact]\n(SalesOrderID 1, SalesOrderDetailID 2, OrderQty 3,ProductID 4\n,UnitPrice 5, UnitPriceDiscount 6, LineTotal 7, ModifiedDate 9)\nFROM 'https://adlgen2gradjhb.dfs.core.windows.net/dladventureworks/datalake/SalesLtSalesOrderDetail'\nGO\n\nSELECT * from [adventureworks_schema].[SalesOrderDetail_Fact]\n\t\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreaterExtProdDesc')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[ProductDesc]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [ext].[ProductDesc]\n\t(\n\t [ProductDescriptionID] int,\n\t [Description] nvarchar(4000)\n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t CLUSTERED COLUMNSTORE INDEX\n\t -- HEAP\n\t)\nGO\n\n--Uncomment the 4 lines below to create a stored procedure for data pipeline orchestration​\n--CREATE PROC bulk_load_[ProductCat]\n--AS\n--BEGIN\nINSERT INTO [ext].[ProductDesc]\n(ProductDescriptionID, Description)\nSELECT [ProductDescriptionID], [Description]\nFROM [adventureworks_schema].[ProductDescription_Dim]\n--END\nGO\n\nSELECT TOP 100 * FROM [ext].[ProductDesc]\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PopulateDateDimension')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "CREATE PROCEDURE [adventureworks_schema].[PopulateDateDimensionForYear] @Year [int] AS\nBEGIN\n    IF OBJECT_ID('tempdb..#month', 'U') IS NOT NULL\n        DROP TABLE #month\n    CREATE TABLE #month (\n        monthnum int,\n        numofdays int\n    )\n    WITH ( DISTRIBUTION = ROUND_ROBIN, heap )\n    INSERT INTO #month\n        SELECT 1, 31 UNION SELECT 2, CASE WHEN (@YEAR % 4 = 0 AND @YEAR % 100 <> 0) OR @YEAR % 400 = 0 THEN 29 ELSE 28 END UNION SELECT 3,31 UNION SELECT 4,30 UNION SELECT 5,31 UNION SELECT 6,30 UNION SELECT 7,31 UNION SELECT 8,31 UNION SELECT 9,30 UNION SELECT 10,31 UNION SELECT 11,30 UNION SELECT 12,31\n\n    IF OBJECT_ID('tempdb..#days', 'U') IS NOT NULL\n        DROP TABLE #days\n    CREATE TABLE #days (days int)\n    WITH (DISTRIBUTION = ROUND_ROBIN, HEAP)\n\n    INSERT INTO #days\n        SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20    UNION SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30 UNION SELECT 31\n\n    INSERT [adventureworks_schema].[Date_Dim] (\n       [DateID], [Date], [Day], [Month], [Year]\n    )\n    SELECT\n        CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [DateID]\n        ,CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [Date]\n        ,CAST(DATENAME(day, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' \n            + CAST(@year AS CHAR(4)) AS DATE)) AS NVARCHAR(10)) AS [Day]\n        ,CAST(DATENAME(month, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) \n            + '/' + CAST(@year as char(4)) AS DATE)) AS nvarchar(10)) AS [Month]\n        ,CAST(@year as char(4)) AS [Year]\nFROM #month m\n    CROSS JOIN #days d\nWHERE d.days <= m.numofdays\n\nDROP table #month;\nDROP table #days;\nEND;\n\nDECLARE @Counter INT \nSET @Counter=2000\nWHILE ( @Counter <= 2021)\nBEGIN\n    exec adventureworks_schema.PopulateDateDimensionForYear @Year = @Counter\n    SET @Counter  = @Counter  + 1\nEND\n\nSELECT * FROM [adventureworks_schema].[Date_Dim]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT TOP (100) [CustomerID]\n,[Title]\n,[FirstName]\n,[MiddleName]\n,[LastName]\n,[Suffix]\n,[CompanyName]\n,[SalesPerson]\n,[EmailAddress]\n,[Phone]\n,[PasswordHash]\n,[PasswordSalt]\n,[ModifiedDate]\n,[HashKey]\n FROM [adventureworks_schema].[Customer_Dim]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT *\n FROM [adventureworks_schema].[Address_Dim]\n\n ALTER TABLE [adventureworks_schema].[Address_Dim]\nADD HashKey nvarchar(200);",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT TOP (100) [AddressID]\n,[AddressLine1]\n,[AddressLine2]\n,[City]\n,[StateProvince]\n,[CountryRegion]\n,[PostalCode]\n,[ModifiedDate]\n,[HashKey]\n FROM [adventureworks_schema].[Address_Dim]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT *\n FROM [adventureworks_schema].[Address_Dim]\n WHERE AddressID = ",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/default')]",
+			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"preventDataExfiltration": false
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/default/AzureDataLakeStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"privateLinkResourceId": "/subscriptions/d138d070-e1e1-4cce-89e7-3488bf444519/resourceGroups/rg-grad-jhb/providers/Microsoft.Storage/storageAccounts/adlgen2gradjhb",
+				"groupId": "dfs"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/managedVirtualNetworks/default')]"
+			]
+		}
+	]
+}
