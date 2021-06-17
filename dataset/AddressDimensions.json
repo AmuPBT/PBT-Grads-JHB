@@ -2,10 +2,10 @@
 	"name": "AddressDimensions",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
+			"referenceName": "ls_synapse_adventureworks_lt",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"DBName": "sqlpool_adventureworksLT_jhb"
+				"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
 			}
 		},
 		"annotations": [],
@@ -41,13 +41,22 @@
 				"type": "nvarchar"
 			},
 			{
-				"name": "ModifiedDate",
+				"name": "InsertedDate",
 				"type": "datetime2",
 				"scale": 0
 			},
 			{
-				"name": "HashKey",
+				"name": "Status",
 				"type": "nvarchar"
+			},
+			{
+				"name": "Hashkey",
+				"type": "varchar"
+			},
+			{
+				"name": "ModifiedDate",
+				"type": "datetime2",
+				"scale": 0
 			}
 		],
 		"typeProperties": {
