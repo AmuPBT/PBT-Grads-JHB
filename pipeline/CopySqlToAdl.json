@@ -1,5 +1,5 @@
 {
-	"name": "Copy_SQL_to_ADL",
+	"name": "CopySqlToAdl",
 	"properties": {
 		"activities": [
 			{
