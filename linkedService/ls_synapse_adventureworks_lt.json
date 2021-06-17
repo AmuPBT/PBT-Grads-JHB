@@ -10,7 +10,7 @@
 		"annotations": [],
 		"type": "AzureSqlDW",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synapse-grad-jhb.sql.azuresynapse.net;Initial Catalog=sqlpool_adventureworksLT_jhb"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synapse-grad.sql.azuresynapse.net;Initial Catalog=sqlpool_adventureworksLT_jhb"
 		},
 		"connectVia": {
 			"referenceName": "AutoResolveIntegrationRuntime",
