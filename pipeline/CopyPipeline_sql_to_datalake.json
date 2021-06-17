@@ -14,7 +14,7 @@
 					},
 					"activities": [
 						{
-							"name": "Copy_yih",
+							"name": "Copy",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
