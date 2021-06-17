@@ -1,0 +1,9 @@
+{
+	"name": "adf-grad",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "39cfbcd8-2dff-42cd-841c-14cafad6788a",
+		"tenantId": "16e79c95-57c1-497d-bd45-06210b204f16"
+	}
+}
