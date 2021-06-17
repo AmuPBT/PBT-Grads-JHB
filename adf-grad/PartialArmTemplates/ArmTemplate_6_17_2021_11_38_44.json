@@ -1,0 +1,352 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-grad"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/CopyPipeline_SQL_ADL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "@{item().source.schema}.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "dladventureworks//@{item().destination.fileName}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": true,
+										"stagingSettings": {
+											"linkedServiceName": {
+												"referenceName": "ls_adl_adventureworks_lt",
+												"type": "LinkedServiceReference"
+											},
+											"path": "dladventureworks"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_ffn",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_schema": "@item().source.schema",
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_ffn",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_fileName": "@item().destination.fileName"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"schema": "dbo",
+									"table": "BuildVersion"
+								},
+								"destination": {
+									"fileName": "dboBuildVersion.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "dbo",
+									"table": "ErrorLog"
+								},
+								"destination": {
+									"fileName": "dboErrorLog.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "Address"
+								},
+								"destination": {
+									"fileName": "SalesLTAddress.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "Customer"
+								},
+								"destination": {
+									"fileName": "SalesLTCustomer.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "CustomerAddress"
+								},
+								"destination": {
+									"fileName": "SalesLTCustomerAddress.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "Product"
+								},
+								"destination": {
+									"fileName": "SalesLTProduct.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductCategory"
+								},
+								"destination": {
+									"fileName": "SalesLTProductCategory.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductDescription"
+								},
+								"destination": {
+									"fileName": "SalesLTProductDescription.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductModel"
+								},
+								"destination": {
+									"fileName": "SalesLTProductModel.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "ProductModelProductDescription"
+								},
+								"destination": {
+									"fileName": "SalesLTProductModelProductDescription.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "SalesOrderDetail"
+								},
+								"destination": {
+									"fileName": "SalesLTSalesOrderDetail.txt"
+								}
+							},
+							{
+								"source": {
+									"schema": "SalesLT",
+									"table": "SalesOrderHeader"
+								},
+								"destination": {
+									"fileName": "SalesLTSalesOrderHeader.txt"
+								}
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_ffn')]",
+				"[concat(variables('factoryId'), '/datasets/DestinationDataset_ffn')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabaseDataSource')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your data source store.",
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": ""
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataDestination')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to your data destination store.",
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Data_Destination_Container": {
+						"type": "String"
+					},
+					"Data_Destination_Directory": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@{dataset().Data_Destination_Directory}",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@{dataset().Data_Destination_Container}",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DestinationDataset_ffn')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_fileName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().cw_fileName",
+							"type": "Expression"
+						},
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_ffn')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_schema": {
+						"type": "String"
+					},
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().cw_schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

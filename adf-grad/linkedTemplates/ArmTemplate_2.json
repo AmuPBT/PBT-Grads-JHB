@@ -13,6 +13,224 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/SalesLTSOD')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTSalesOrderDetail",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesLTSOH')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adl_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "SalesLTSalesOrderHeader",
+						"folderPath": "datalake",
+						"fileSystem": "dladventureworks"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesOrderDetail')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "AdventureWorksLT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderDetailID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "UnitPriceDiscount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "LineTotal",
+						"type": "decimal",
+						"precision": 38,
+						"scale": 6
+					},
+					{
+						"name": "rowguid",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "SalesLT",
+					"table": "SalesOrderDetail"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SalesOrderDetailFact')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -398,6 +616,39 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_ffn')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_schema": {
+						"type": "String"
+					},
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().cw_schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SourceDataset_yih')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -431,13 +682,13 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/CopyPipeline_sql_to_datalake')]",
+			"name": "[concat(parameters('factoryName'), '/CopyPipeline_SQL_ADL')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "ForEach_yih",
+						"name": "ForEach",
 						"type": "ForEach",
 						"dependsOn": [],
 						"userProperties": [],
@@ -448,7 +699,7 @@
 							},
 							"activities": [
 								{
-									"name": "Copy_yih",
+									"name": "Copy",
 									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
@@ -465,7 +716,7 @@
 										},
 										{
 											"name": "Destination",
-											"value": "dladventureworks/datalake/@{item().destination.fileName}"
+											"value": "dladventureworks//@{item().destination.fileName}"
 										}
 									],
 									"typeProperties": {
@@ -484,12 +735,18 @@
 												"fileExtension": ".txt"
 											}
 										},
-										"enableStaging": false,
-										"validateDataConsistency": false
+										"enableStaging": true,
+										"stagingSettings": {
+											"linkedServiceName": {
+												"referenceName": "ls_adl_adventureworks_lt",
+												"type": "LinkedServiceReference"
+											},
+											"path": "dladventureworks"
+										}
 									},
 									"inputs": [
 										{
-											"referenceName": "SourceDataset_yih",
+											"referenceName": "SourceDataset_ffn",
 											"type": "DatasetReference",
 											"parameters": {
 												"cw_schema": "@item().source.schema",
@@ -499,7 +756,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "DestinationDataset_yih",
+											"referenceName": "DestinationDataset_ffn",
 											"type": "DatasetReference",
 											"parameters": {
 												"cw_fileName": "@item().destination.fileName"
@@ -521,7 +778,7 @@
 									"table": "BuildVersion"
 								},
 								"destination": {
-									"fileName": "dboBuildVersion"
+									"fileName": "dboBuildVersion.txt"
 								}
 							},
 							{
@@ -530,7 +787,7 @@
 									"table": "ErrorLog"
 								},
 								"destination": {
-									"fileName": "dboErrorLog"
+									"fileName": "dboErrorLog.txt"
 								}
 							},
 							{
@@ -539,7 +796,7 @@
 									"table": "Address"
 								},
 								"destination": {
-									"fileName": "SalesLTAddress"
+									"fileName": "SalesLTAddress.txt"
 								}
 							},
 							{
@@ -548,7 +805,7 @@
 									"table": "Customer"
 								},
 								"destination": {
-									"fileName": "SalesLTCustomer"
+									"fileName": "SalesLTCustomer.txt"
 								}
 							},
 							{
@@ -557,7 +814,7 @@
 									"table": "CustomerAddress"
 								},
 								"destination": {
-									"fileName": "SalesLTCustomerAddress"
+									"fileName": "SalesLTCustomerAddress.txt"
 								}
 							},
 							{
@@ -566,7 +823,7 @@
 									"table": "Product"
 								},
 								"destination": {
-									"fileName": "SalesLTProduct"
+									"fileName": "SalesLTProduct.txt"
 								}
 							},
 							{
@@ -575,7 +832,7 @@
 									"table": "ProductCategory"
 								},
 								"destination": {
-									"fileName": "SalesLTProductCategory"
+									"fileName": "SalesLTProductCategory.txt"
 								}
 							},
 							{
@@ -584,7 +841,7 @@
 									"table": "ProductDescription"
 								},
 								"destination": {
-									"fileName": "SalesLTProductDescription"
+									"fileName": "SalesLTProductDescription.txt"
 								}
 							},
 							{
@@ -593,7 +850,7 @@
 									"table": "ProductModel"
 								},
 								"destination": {
-									"fileName": "SalesLTProductModel"
+									"fileName": "SalesLTProductModel.txt"
 								}
 							},
 							{
@@ -602,7 +859,7 @@
 									"table": "ProductModelProductDescription"
 								},
 								"destination": {
-									"fileName": "SalesLTProductModelProductDescription"
+									"fileName": "SalesLTProductModelProductDescription.txt"
 								}
 							},
 							{
@@ -611,7 +868,7 @@
 									"table": "SalesOrderDetail"
 								},
 								"destination": {
-									"fileName": "SalesLTSalesOrderDetail"
+									"fileName": "SalesLTSalesOrderDetail.txt"
 								}
 							},
 							{
@@ -620,7 +877,7 @@
 									"table": "SalesOrderHeader"
 								},
 								"destination": {
-									"fileName": "SalesLTSalesOrderHeader"
+									"fileName": "SalesLTSalesOrderHeader.txt"
 								}
 							}
 						]
@@ -629,7 +886,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SourceDataset_yih')]"
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_ffn')]"
 			]
 		},
 		{
@@ -734,6 +991,8 @@
 				}
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SalesLTSOH')]",
+				"[concat(variables('factoryId'), '/datasets/SalesLTSOD')]",
 				"[concat(variables('factoryId'), '/datasets/SalesOrderHeaderFact')]",
 				"[concat(variables('factoryId'), '/datasets/SalesOrderDetailFact')]"
 			]
