@@ -27,9 +27,9 @@
 						},
 						"folderPath": "synapse/stagingFolder"
 					},
-					"integrationRuntime": {
-						"referenceName": "integrationRuntimegrad",
-						"type": "IntegrationRuntimeReference"
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
 					},
 					"traceLevel": "Fine"
 				}
