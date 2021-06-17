@@ -22,7 +22,7 @@
 					},
 					"staging": {
 						"linkedService": {
-							"referenceName": "ls_adl_adventureworks_lt",
+							"referenceName": "synapse-grad-WorkspaceDefaultStorage",
 							"type": "LinkedServiceReference"
 						},
 						"folderPath": "synapse/stagingFolder"
