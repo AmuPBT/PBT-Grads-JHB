@@ -3576,7 +3576,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "CREATE PROCEDURE [adventureworks_schema].[PopulateDateDimensionForYear] @Year [int] AS\nBEGIN\n    IF OBJECT_ID('tempdb..#month', 'U') IS NOT NULL\n        DROP TABLE #month\n    CREATE TABLE #month (\n        monthnum int,\n        numofdays int\n    )\n    WITH ( DISTRIBUTION = ROUND_ROBIN, heap )\n    INSERT INTO #month\n        SELECT 1, 31 UNION SELECT 2, CASE WHEN (@YEAR % 4 = 0 AND @YEAR % 100 <> 0) OR @YEAR % 400 = 0 THEN 29 ELSE 28 END UNION SELECT 3,31 UNION SELECT 4,30 UNION SELECT 5,31 UNION SELECT 6,30 UNION SELECT 7,31 UNION SELECT 8,31 UNION SELECT 9,30 UNION SELECT 10,31 UNION SELECT 11,30 UNION SELECT 12,31\n\n    IF OBJECT_ID('tempdb..#days', 'U') IS NOT NULL\n        DROP TABLE #days\n    CREATE TABLE #days (days int)\n    WITH (DISTRIBUTION = ROUND_ROBIN, HEAP)\n\n    INSERT INTO #days\n        SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20    UNION SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30 UNION SELECT 31\n\n    INSERT [adventureworks_schema].[Date_Dim] (\n       [DateID], [Date], [Day], [Month], [Year]\n    )\n    SELECT\n        CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [DateID]\n        ,CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [Date]\n        ,CAST(DATENAME(day, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' \n            + CAST(@year AS CHAR(4)) AS DATE)) AS NVARCHAR(10)) AS [Day]\n        ,CAST(DATENAME(month, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) \n            + '/' + CAST(@year as char(4)) AS DATE)) AS nvarchar(10)) AS [Month]\n        ,CAST(@year as char(4)) AS [Year]\nFROM #month m\n    CROSS JOIN #days d\nWHERE d.days <= m.numofdays\n\nDROP table #month;\nDROP table #days;\nEND;\n\nDECLARE @Counter INT \nSET @Counter=2000\nWHILE ( @Counter <= 2021)\nBEGIN\n    exec adventureworks_schema.PopulateDateDimensionForYear @Year = @Counter\n    SET @Counter  = @Counter  + 1\nEND\n\nSELECT * FROM [adventureworks_schema].[Date_Dim]",
+					"query": "CREATE PROCEDURE [adventureworks_schema].[PopulateDateDimensionForYear] @Year [int] AS\nBEGIN\n    IF OBJECT_ID('tempdb..#month', 'U') IS NOT NULL\n        DROP TABLE #month\n    CREATE TABLE #month (\n        monthnum int,\n        numofdays int\n    )\n    WITH ( DISTRIBUTION = ROUND_ROBIN, heap )\n    INSERT INTO #month\n        SELECT 1, 31 UNION SELECT 2, CASE WHEN (@YEAR % 4 = 0 AND @YEAR % 100 <> 0) OR @YEAR % 400 = 0 THEN 29 ELSE 28 END UNION SELECT 3,31 UNION SELECT 4,30 UNION SELECT 5,31 UNION SELECT 6,30 UNION SELECT 7,31 UNION SELECT 8,31 UNION SELECT 9,30 UNION SELECT 10,31 UNION SELECT 11,30 UNION SELECT 12,31\n\n    IF OBJECT_ID('tempdb..#days', 'U') IS NOT NULL\n        DROP TABLE #days\n    CREATE TABLE #days (days int)\n    WITH (DISTRIBUTION = ROUND_ROBIN, HEAP)\n\n    INSERT INTO #days\n        SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20    UNION SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30 UNION SELECT 31\n\n    INSERT [adventureworks_schema].[Date_Dim] (\n       [DateID], [Date], [Day], [Month], [Year]\n    )\n    SELECT\n        CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [DateID]\n        ,CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' + CAST(@year AS CHAR(4)) AS DATE) AS [Date]\n        ,CAST(DATENAME(day, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) + '/' \n            + CAST(@year AS CHAR(4)) AS DATE)) AS NVARCHAR(10)) AS [Day]\n        ,CAST(DATENAME(month, CAST(CAST(monthnum AS VARCHAR(2)) + '/' + CAST([days] AS VARCHAR(3)) \n            + '/' + CAST(@year as char(4)) AS DATE)) AS nvarchar(10)) AS [Month]\n        ,CAST(@year as char(4)) AS [Year]\nFROM #month m\n    CROSS JOIN #days d\nWHERE d.days <= m.numofdays\n\nDROP table #month;\nDROP table #days;\nEND;\n\nDECLARE @Counter INT \nSET @Counter=2000\nWHILE ( @Counter <= 2030)\nBEGIN\n    exec adventureworks_schema.PopulateDateDimensionForYear @Year = @Counter\n    SET @Counter  = @Counter  + 1\nEND\n\nSELECT * FROM [adventureworks_schema].[Date_Dim]",
 					"metadata": {
 						"language": "sql"
 					},
@@ -3669,6 +3669,19 @@
 				"type": "SqlQuery"
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sqlpool_adventureworksLT_jhb')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"restorePointInTime": "0001-01-01T00:00:00",
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "northeurope"
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/default')]",
