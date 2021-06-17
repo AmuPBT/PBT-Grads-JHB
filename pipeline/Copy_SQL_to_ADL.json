@@ -1,5 +1,5 @@
 {
-	"name": "CopyPipeline_SQL_ADL",
+	"name": "Copy_SQL_to_ADL",
 	"properties": {
 		"activities": [
 			{
