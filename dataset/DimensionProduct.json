@@ -42,45 +42,37 @@
 			},
 			{
 				"name": "ListPrice",
-				"type": "decimal",
-				"precision": 8,
-				"scale": 2
+				"type": "float",
+				"precision": 15
 			},
 			{
 				"name": "StandardCost",
-				"type": "decimal",
-				"precision": 8,
-				"scale": 2
+				"type": "float",
+				"precision": 15
 			},
 			{
 				"name": "Weight",
-				"type": "decimal",
-				"precision": 8,
-				"scale": 2
+				"type": "float",
+				"precision": 15
 			},
 			{
 				"name": "SellEndDateID",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
+				"type": "datetime2",
+				"scale": 0
 			},
 			{
 				"name": "SellStartDateID",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
+				"type": "datetime2",
+				"scale": 0
 			},
 			{
 				"name": "DiscontinuedDateID",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
+				"type": "nvarchar"
 			},
 			{
 				"name": "ModifiedDateID",
-				"type": "datetime",
-				"precision": 23,
-				"scale": 3
+				"type": "datetime2",
+				"scale": 0
 			},
 			{
 				"name": "DescriptionCultureAr",
@@ -104,6 +96,18 @@
 			},
 			{
 				"name": "DescriptionCultureZh-cht",
+				"type": "nvarchar"
+			},
+			{
+				"name": "InsertedDate",
+				"type": "nvarchar"
+			},
+			{
+				"name": "HashKey",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Status",
 				"type": "nvarchar"
 			}
 		],
