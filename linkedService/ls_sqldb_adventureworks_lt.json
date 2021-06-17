@@ -4,10 +4,10 @@
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlsvr-grad-jhb.database.windows.net;Initial Catalog=Adventureworks-LT"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sqlsvr-grad.database.windows.net;Initial Catalog=AdventureWorks_LT"
 		},
 		"connectVia": {
-			"referenceName": "AutoResolveIntegrationRuntime",
+			"referenceName": "integrationRuntimegrad",
 			"type": "IntegrationRuntimeReference"
 		}
 	},
