@@ -1,5 +1,5 @@
 {
-	"name": "SQL script 1",
+	"name": "CreateProdim",
 	"properties": {
 		"content": {
 			"query": "DROP TABLE [adventureworks_schema].[Product]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[Product_Dim]\n( \n\t[ProductID] [int]  NULL,\n\t[ModelName] [nvarchar](4000)  NULL,\n\t[ProductName] [nvarchar](4000)  NULL,\n\t[Color] [nvarchar](4000)  NULL,\n\t[ProductNumber] [nvarchar](4000)  NULL,\n\t[ProductCategoryName] [nvarchar](4000)  NULL,\n\t[Size] [nvarchar](4000)  NULL,\n\t[ListPrice] [float]  NULL,\n\t[StandardCost] [float]  NULL,\n\t[Weight] [float]  NULL,\n\t[SellEndDateID] [datetime2](0)  NULL,\n\t[SellStartDateID] [datetime2](0)  NULL,\n\t[DiscontinuedDateID] [nvarchar](4000)  NULL,\n\t[ModifiedDateID] [datetime2](0)  NULL,\n\t[DescriptionCultureAr] [nvarchar](4000)  NULL,\n\t[DescriptionCultureEn] [nvarchar](4000)  NULL,\n\t[DescriptionCultureFr] [nvarchar](4000)  NULL,\n\t[DescriptionCultureHe] [nvarchar](4000)  NULL,\n\t[DescriptionCultureTh] [nvarchar](4000)  NULL,\n\t[DescriptionCultureZh-cht] [nvarchar](4000)  NULL,\n\t[InsertedDate] [nvarchar](4000)  NULL,\n\t[HashKey] [nvarchar](4000)  NULL,\n\t[Status] [nvarchar](4000)  NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tHEAP\n)\nGO",
