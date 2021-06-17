@@ -61,13 +61,22 @@
 				"type": "varchar"
 			},
 			{
-				"name": "ModifiedDate",
+				"name": "InsertedDate",
 				"type": "datetime2",
 				"scale": 0
 			},
 			{
-				"name": "HashKey",
-				"type": "char"
+				"name": "Status",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Hashkey",
+				"type": "varchar"
+			},
+			{
+				"name": "ModifiedDate",
+				"type": "datetime2",
+				"scale": 0
 			}
 		],
 		"typeProperties": {
