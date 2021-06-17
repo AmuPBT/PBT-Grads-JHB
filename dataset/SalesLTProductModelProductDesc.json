@@ -10,8 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "SalesLTProductModelProductDescription",
-				"folderPath": "datalake",
+				"fileName": "SalesLTProductModelProductDescription.txt",
 				"fileSystem": "dladventureworks"
 			},
 			"columnDelimiter": ",",
