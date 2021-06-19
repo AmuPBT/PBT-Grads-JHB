@@ -1,0 +1,17 @@
+{
+	"name": "SQL script 7",
+	"properties": {
+		"content": {
+			"query": "DROP TABLE [adventureworks_schema].[SalesOrderHeader_Fact]\nGO\n\nSET ANSI_NULLS ON\nGO\nSET QUOTED_IDENTIFIER ON\nGO\n\nCREATE TABLE [adventureworks_schema].[SalesOrderHeader_Fact]\n( \n\t[SalesOrderID] [int] NOT NULL,\n\t[CustomerID] [int]  not NULL,\n\t[ShipToAddressID] [int]  NULL,\n\t[BillToAddressID] [int]  NULL,\n\t[OrderDateID] [date]  NULL,\n\t[DueDateID] [date]  NULL,\n\t[ShipDateID] [date]  NULL,\n\t[ModifiedDateID] [date]  NULL,\n\t[OnlineOrderFlag] [bit]  NULL,\n\t[SubTotal] [money]  NULL,\n\t[TaxAmt] [money]  NULL,\n\t[Freight] [money]  NULL,\n\t[TotalDue] [money]  NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"poolName": "sqlpool_adventureworksLT_jhb",
+				"databaseName": "sqlpool_adventureworksLT_jhb"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
