@@ -1,5 +1,5 @@
 {
-	"name": "DateDimension",
+	"name": "DateDim",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_synapse_adventureworks_lt",
