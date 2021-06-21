@@ -288,18 +288,13 @@
 									"Customer": {},
 									"DimCustomer": {},
 									"DimAddress": {},
-									"SinkProductDimension": {},
-									"Sink": {},
-									"sink1": {}
+									"DimProduct": {},
+									"SinkProduct": {},
+									"SinkCustomer": {},
+									"SinkAddress": {}
 								}
 							},
-							"staging": {
-								"linkedService": {
-									"referenceName": "ls_adl_adventureworks_lt",
-									"type": "LinkedServiceReference"
-								},
-								"folderPath": "synapse/stagingFolder"
-							},
+							"staging": {},
 							"compute": {
 								"coreCount": 8,
 								"computeType": "General"
@@ -311,9 +306,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/dataflows/DimensionTrasformation')]",
-				"[concat(variables('workspaceId'), '/linkedServices/ls_adl_adventureworks_lt')]",
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+				"[concat(variables('workspaceId'), '/dataflows/DimensionTrasformation')]"
 			]
 		},
 		{
@@ -345,6 +338,7 @@
 									"SOH": {},
 									"SOD": {},
 									"Product": {},
+									"Address": {},
 									"sinkSOH": {},
 									"sinkSOD": {}
 								}
@@ -426,128 +420,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/AddressDimension')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": "sqlpool_adventureworksLT_jhb"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "AddressID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "AddressLine1",
-						"type": "nvarchar"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "City",
-						"type": "nvarchar"
-					},
-					{
-						"name": "StateProvince",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CountryRegion",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PostalCode",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime2",
-						"scale": 0
-					}
-				],
-				"typeProperties": {
-					"schema": "adventureworks_schema",
-					"table": "Address_Dim"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/synapse-grad-jhb-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/AddressDimensions')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": "sqlpool_adventureworksLT_jhb"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "AddressID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "AddressLine1",
-						"type": "nvarchar"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "City",
-						"type": "nvarchar"
-					},
-					{
-						"name": "StateProvince",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CountryRegion",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PostalCode",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime2",
-						"scale": 0
-					},
-					{
-						"name": "HashKey",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "adventureworks_schema",
-					"table": "Address_Dim"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/synapse-grad-jhb-WorkspaceDefaultSqlServer')]"
 			]
 		},
 		{
@@ -707,89 +579,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/ls_sqldb_adventureworks_lt')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/CustomerDimension')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_synapse_adventureworks_lt",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "CustomerID",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "Title",
-						"type": "nvarchar"
-					},
-					{
-						"name": "FirstName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "MiddleName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "LastName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Suffix",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CompanyName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "SalesPerson",
-						"type": "nvarchar"
-					},
-					{
-						"name": "EmailAddress",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Phone",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PasswordHash",
-						"type": "varchar"
-					},
-					{
-						"name": "PasswordSalt",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime2",
-						"scale": 0
-					},
-					{
-						"name": "HashKey",
-						"type": "char"
-					}
-				],
-				"typeProperties": {
-					"schema": "adventureworks_schema",
-					"table": "Customer_Dim"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
 			]
 		},
 		{
@@ -953,66 +742,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/DimAddressSource')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "synapse-grad-jhb-WorkspaceDefaultSqlServer",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DBName": "sqlpool_adventureworksLT_jhb"
-					}
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "AddressID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "AddressLine1",
-						"type": "nvarchar"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "City",
-						"type": "nvarchar"
-					},
-					{
-						"name": "StateProvince",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CountryRegion",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PostalCode",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime2",
-						"scale": 0
-					}
-				],
-				"typeProperties": {
-					"schema": "adventureworks_schema",
-					"table": "Address_Dim"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/synapse-grad-jhb-WorkspaceDefaultSqlServer')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/DimensionProduct')]",
+			"name": "[concat(parameters('workspaceName'), '/DimCustomer')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -1025,106 +755,10 @@
 				},
 				"annotations": [],
 				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "ProductID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ModelName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ProductName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Color",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ProductNumber",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ProductCategoryName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Size",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ListPrice",
-						"type": "decimal",
-						"precision": 8,
-						"scale": 2
-					},
-					{
-						"name": "StandardCost",
-						"type": "decimal",
-						"precision": 8,
-						"scale": 2
-					},
-					{
-						"name": "Weight",
-						"type": "decimal",
-						"precision": 8,
-						"scale": 2
-					},
-					{
-						"name": "SellEndDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "SellStartDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DiscontinuedDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DescriptionCultureAr",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureEn",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureFr",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureHe",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureTh",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureZh-cht",
-						"type": "nvarchar"
-					}
-				],
+				"schema": [],
 				"typeProperties": {
 					"schema": "adventureworks_schema",
-					"table": "Product_Dim"
+					"table": "Customer_Dim"
 				}
 			},
 			"dependsOn": [
@@ -1335,123 +969,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/ProductDim')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_synapse_adventureworks_lt",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "ProductID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ModelName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ProductName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Color",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ProductNumber",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ProductCategoryName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "Size",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ListPrice",
-						"type": "decimal",
-						"precision": 8,
-						"scale": 2
-					},
-					{
-						"name": "StandardCost",
-						"type": "decimal",
-						"precision": 8,
-						"scale": 2
-					},
-					{
-						"name": "Weight",
-						"type": "decimal",
-						"precision": 8,
-						"scale": 2
-					},
-					{
-						"name": "SellEndDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "SellStartDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DiscontinuedDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "DescriptionCultureAr",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureEn",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureFr",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureHe",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureTh",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DescriptionCultureZh-cht",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "adventureworks_schema",
-					"table": "Product_Dim"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/ProductModel')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -1605,6 +1122,164 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/SODFact')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "SalesOrderDetailID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ModifiedDateID",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "OrderQty",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UnitPrice",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "UnitPriceDiscount",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "LineTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "SalesOrderDetail_Fact"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SOHFact')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "SalesOrderID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CustomerID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ShipToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "BillToAddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "OrderDateID",
+						"type": "date"
+					},
+					{
+						"name": "DueDateID",
+						"type": "date"
+					},
+					{
+						"name": "ShipDateID",
+						"type": "date"
+					},
+					{
+						"name": "ModifiedDateID",
+						"type": "date"
+					},
+					{
+						"name": "OnlineOrderFlag",
+						"type": "bit"
+					},
+					{
+						"name": "SubTotal",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TaxAmt",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "Freight",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					},
+					{
+						"name": "TotalDue",
+						"type": "money",
+						"precision": 19,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "SalesOrderHeader_Fact"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/SalesLTAddress')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -1618,8 +1293,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTAddress",
-						"folderPath": "datalake",
+						"fileName": "SalesLTAddress.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -1674,12 +1348,12 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTCustomer",
-						"folderPath": "datalake",
+						"fileName": "SalesLTCustomer.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
+					"firstRowAsHeader": false,
 					"quoteChar": "\""
 				},
 				"schema": [
@@ -1748,8 +1422,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTProduct",
-						"folderPath": "datalake",
+						"fileName": "SalesLTProduct.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -1828,8 +1501,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTProductCategory",
-						"folderPath": "datalake",
+						"fileName": "SalesLTProductCategory.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -1872,8 +1544,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTProductDescription",
-						"folderPath": "datalake",
+						"fileName": "SalesLTProductDescription.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -1913,8 +1584,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTProductModel",
-						"folderPath": "datalake",
+						"fileName": "SalesLTProductModel.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -1957,8 +1627,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTProductModelProductDescription",
-						"folderPath": "datalake",
+						"fileName": "SalesLTProductModelProductDescription.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -2001,8 +1670,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTSalesOrderDetail",
-						"folderPath": "datalake",
+						"fileName": "SalesLTSalesOrderDetail.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -2057,8 +1725,7 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "SalesLTSalesOrderHeader",
-						"folderPath": "datalake",
+						"fileName": "SalesLTSalesOrderHeader.txt",
 						"fileSystem": "dladventureworks"
 					},
 					"columnDelimiter": ",",
@@ -2218,7 +1885,10 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "ls_synapse_adventureworks_lt",
-					"type": "LinkedServiceReference"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
 				},
 				"annotations": [],
 				"type": "AzureSqlDWTable",
@@ -2232,12 +1902,6 @@
 						"name": "SalesOrderDetailID",
 						"type": "int",
 						"precision": 10
-					},
-					{
-						"name": "ModifiedDateID",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
 					},
 					{
 						"name": "OrderQty",
@@ -2266,6 +1930,12 @@
 						"type": "money",
 						"precision": 19,
 						"scale": 4
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
 					}
 				],
 				"typeProperties": {
@@ -2419,10 +2089,7 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "ls_synapse_adventureworks_lt",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
-					}
+					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
 				"type": "AzureSqlDWTable",
@@ -2495,62 +2162,6 @@
 				"typeProperties": {
 					"schema": "adventureworks_schema",
 					"table": "SalesOrderHeader_Fact"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SinkAddress')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_synapse_adventureworks_lt",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlDWTable",
-				"schema": [
-					{
-						"name": "AddressID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "AddressLine1",
-						"type": "nvarchar"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "nvarchar"
-					},
-					{
-						"name": "City",
-						"type": "nvarchar"
-					},
-					{
-						"name": "StateProvince",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CountryRegion",
-						"type": "nvarchar"
-					},
-					{
-						"name": "PostalCode",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime2",
-						"scale": 0
-					}
-				],
-				"typeProperties": {
-					"schema": "adventureworks_schema",
-					"table": "Address_Dim"
 				}
 			},
 			"dependsOn": [
@@ -2844,37 +2455,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/DimLoaderTrigger')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "DimLoaderAndTransformations",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Minute",
-						"interval": 5,
-						"startTime": "2021-06-11T21:33:00",
-						"endTime": "2021-06-11T22:33:00",
-						"timeZone": "GMT Standard Time"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/DimLoaderAndTransformations')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
 			"apiVersion": "2019-06-01-preview",
@@ -2960,7 +2540,7 @@
 						},
 						{
 							"dataset": {
-								"referenceName": "CustomerDimension",
+								"referenceName": "DimCustomer",
 								"type": "DatasetReference"
 							},
 							"name": "Customer"
@@ -2985,6 +2565,13 @@
 								"type": "DatasetReference"
 							},
 							"name": "Product"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimensionAddress",
+								"type": "DatasetReference"
+							},
+							"name": "Address"
 						}
 					],
 					"sinks": [
@@ -3005,9 +2592,6 @@
 					],
 					"transformations": [
 						{
-							"name": "JoinOrderDate"
-						},
-						{
 							"name": "JoinCustomer"
 						},
 						{
@@ -3020,18 +2604,6 @@
 							"name": "SelectSOH1"
 						},
 						{
-							"name": "JoinShipDate"
-						},
-						{
-							"name": "SelectSOH2"
-						},
-						{
-							"name": "JoinModifiedDate"
-						},
-						{
-							"name": "SelectSOH3"
-						},
-						{
 							"name": "JoinProduct"
 						},
 						{
@@ -3039,17 +2611,33 @@
 						},
 						{
 							"name": "SelectSOD"
+						},
+						{
+							"name": "SetDatesSOD"
+						},
+						{
+							"name": "JoinShipAddress"
+						},
+						{
+							"name": "JoinBillAddress"
+						},
+						{
+							"name": "SOHSelect"
+						},
+						{
+							"name": "SetDatesSOH"
 						}
 					],
-					"script": "source(output(\n\t\tDateID as date,\n\t\tDate as date,\n\t\tDay as string,\n\t\tMonth as string,\n\t\tYear as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Date\nsource(output(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Customer\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as short,\n\t\tOrderDate as date,\n\t\tDueDate as date,\n\t\tShipDate as date,\n\t\tStatus as short,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipMethod as string,\n\t\tCreditCardApprovalCode as string,\n\t\tSubTotal as double,\n\t\tTaxAmt as double,\n\t\tFreight as double,\n\t\tTotalDue as double,\n\t\tComment as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SOH\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tOrderQty as short,\n\t\tProductID as integer,\n\t\tUnitPrice as double,\n\t\tUnitPriceDiscount as double,\n\t\tLineTotal as double,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SOD\nsource(output(\n\t\tProductID as integer,\n\t\tModelName as string,\n\t\tProductName as string,\n\t\tColor as string,\n\t\tProductNumber as string,\n\t\tProductCategoryName as string,\n\t\tSize as string,\n\t\tListPrice as decimal(8,2),\n\t\tStandardCost as decimal(8,2),\n\t\tWeight as decimal(8,2),\n\t\tSellEndDateID as timestamp,\n\t\tSellStartDateID as timestamp,\n\t\tDiscontinuedDateID as timestamp,\n\t\tModifiedDateID as timestamp,\n\t\tDescriptionCultureAr as string,\n\t\tDescriptionCultureEn as string,\n\t\tDescriptionCultureFr as string,\n\t\tDescriptionCultureHe as string,\n\t\tDescriptionCultureTh as string,\n\t\t{DescriptionCultureZh-cht} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Product\nSOH, Date join(OrderDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinOrderDate\nJoinOrderDate, Customer join(SOH@CustomerID == Customer@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinCustomer\nJoinCustomer select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID = DateID,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID = Customer@CustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate = SOH@ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH\nSelectSOH, Date join(DueDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinDueDate\nJoinDueDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID = DateID,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH1\nSelectSOH1, Date join(ShipDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinShipDate\nJoinShipDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID = DateID,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH2\nSelectSOH2, Date join(ModifiedDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinModifiedDate\nJoinModifiedDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDateID = DateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH3\nSOD, Product join(SOD@ProductID == Product@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinProduct\nJoinProduct, Date join(ModifiedDate == DateID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinDate\nJoinDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tSalesOrderDetailID,\n\t\tOrderQty,\n\t\tProductID = Product@ProductID,\n\t\tUnitPrice,\n\t\tUnitPriceDiscount,\n\t\tLineTotal,\n\t\trowguid,\n\t\tModifiedDateID = DateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOD\nSelectSOH3 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSalesOrderID as integer,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tOrderDateID as date,\n\t\tDueDateID as date,\n\t\tShipDateID as date,\n\t\tModifiedDateID as date,\n\t\tOnlineOrderFlag as boolean,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4)\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tSalesOrderID,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tOrderDateID,\n\t\tDueDateID,\n\t\tShipDateID,\n\t\tModifiedDateID,\n\t\tOnlineOrderFlag,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue\n\t)) ~> sinkSOH\nSelectSOD sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tModifiedDateID as timestamp,\n\t\tOrderQty as integer,\n\t\tProductID as integer,\n\t\tUnitPrice as decimal(19,4),\n\t\tUnitPriceDiscount as decimal(19,4),\n\t\tLineTotal as decimal(19,4)\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError') ~> sinkSOD"
+					"script": "source(output(\n\t\tDateID as date,\n\t\tDate as date,\n\t\tDay as string,\n\t\tMonth as string,\n\t\tYear as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Date\nsource(output(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tInsertedDate as timestamp,\n\t\tHashkey as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Customer\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tRevisionNumber as short,\n\t\tOrderDate as date,\n\t\tDueDate as date,\n\t\tShipDate as date,\n\t\tStatus as short,\n\t\tOnlineOrderFlag as boolean,\n\t\tSalesOrderNumber as string,\n\t\tPurchaseOrderNumber as string,\n\t\tAccountNumber as string,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tShipMethod as string,\n\t\tCreditCardApprovalCode as string,\n\t\tSubTotal as double,\n\t\tTaxAmt as double,\n\t\tFreight as double,\n\t\tTotalDue as double,\n\t\tComment as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SOH\nsource(output(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tOrderQty as short,\n\t\tProductID as integer,\n\t\tUnitPrice as double,\n\t\tUnitPriceDiscount as double,\n\t\tLineTotal as double,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> SOD\nsource(output(\n\t\tProductID as integer,\n\t\tModelName as string,\n\t\tProductName as string,\n\t\tColor as string,\n\t\tProductNumber as string,\n\t\tProductCategoryName as string,\n\t\tSize as string,\n\t\tListPrice as double,\n\t\tStandardCost as double,\n\t\tWeight as double,\n\t\tSellEndDateID as timestamp,\n\t\tSellStartDateID as timestamp,\n\t\tDiscontinuedDateID as string,\n\t\tModifiedDateID as timestamp,\n\t\tDescriptionCultureAr as string,\n\t\tDescriptionCultureEn as string,\n\t\tDescriptionCultureFr as string,\n\t\tDescriptionCultureHe as string,\n\t\tDescriptionCultureTh as string,\n\t\t{DescriptionCultureZh-cht} as string,\n\t\tInsertedDate as string,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Product\nsource(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\tInsertedDate as timestamp,\n\t\tHashkey as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> Address\nSOH, Customer join(SOH@CustomerID == Customer@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinCustomer\nJoinShipAddress select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID = OrderDate,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID = Customer@CustomerID,\n\t\tShipToAddressID = AddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate = SOH@ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH\nSOHSelect, Date join(DueDate == DateID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinDueDate\nJoinDueDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOH1\nSOD, Product join(SOD@ProductID == Product@ProductID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProduct\nJoinProduct, Date join(ModifiedDate == DateID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinDate\nJoinDate select(mapColumn(\n\t\tSalesOrderID,\n\t\tSalesOrderDetailID,\n\t\tOrderQty,\n\t\tProductID = Product@ProductID,\n\t\tUnitPrice,\n\t\tUnitPriceDiscount,\n\t\tLineTotal,\n\t\trowguid,\n\t\tModifiedDateID = ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectSOD\nSelectSOD derive(ModifiedDateID = iif(isNull(ModifiedDateID), \r\ncurrentDate(), ModifiedDateID)) ~> SetDatesSOD\nJoinCustomer, Address join(ShipToAddressID == AddressID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinShipAddress\nSelectSOH, Address join(BillToAddressID == AddressID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinBillAddress\nJoinBillAddress select(mapColumn(\n\t\tSalesOrderID,\n\t\tRevisionNumber,\n\t\tOrderDateID,\n\t\tDueDate,\n\t\tShipDate,\n\t\tStatus,\n\t\tSalesOrderNumber,\n\t\tPurchaseOrderNumber,\n\t\tAccountNumber,\n\t\tOnlineOrderFlag,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID = AddressID,\n\t\tShipMethod,\n\t\tCreditCardApprovalCode,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tComment,\n\t\trowguid,\n\t\tModifiedDate = SelectSOH@ModifiedDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SOHSelect\nSelectSOH1 derive(ModifiedDate = iif(isNull(ModifiedDate), currentDate(), ModifiedDate)) ~> SetDatesSOH\nSetDatesSOH sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSalesOrderID as integer,\n\t\tCustomerID as integer,\n\t\tShipToAddressID as integer,\n\t\tBillToAddressID as integer,\n\t\tOrderDateID as date,\n\t\tDueDateID as date,\n\t\tShipDateID as date,\n\t\tModifiedDateID as date,\n\t\tOnlineOrderFlag as boolean,\n\t\tSubTotal as decimal(19,4),\n\t\tTaxAmt as decimal(19,4),\n\t\tFreight as decimal(19,4),\n\t\tTotalDue as decimal(19,4)\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tSalesOrderID,\n\t\tCustomerID,\n\t\tShipToAddressID,\n\t\tBillToAddressID,\n\t\tOrderDateID,\n\t\tDueDateID = DueDate,\n\t\tShipDateID = ShipDate,\n\t\tOnlineOrderFlag,\n\t\tSubTotal,\n\t\tTaxAmt,\n\t\tFreight,\n\t\tTotalDue,\n\t\tModifiedDateID = ModifiedDate\n\t)) ~> sinkSOH\nSetDatesSOD sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tSalesOrderID as integer,\n\t\tSalesOrderDetailID as integer,\n\t\tOrderQty as integer,\n\t\tProductID as integer,\n\t\tUnitPrice as decimal(19,4),\n\t\tUnitPriceDiscount as decimal(19,4),\n\t\tLineTotal as decimal(19,4),\n\t\tModifiedDate as timestamp\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tSalesOrderID,\n\t\tSalesOrderDetailID,\n\t\tOrderQty,\n\t\tProductID,\n\t\tUnitPrice,\n\t\tUnitPriceDiscount,\n\t\tLineTotal,\n\t\tModifiedDate = ModifiedDateID\n\t)) ~> sinkSOD"
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/DateDimension')]",
-				"[concat(variables('workspaceId'), '/datasets/CustomerDimension')]",
+				"[concat(variables('workspaceId'), '/datasets/DimCustomer')]",
 				"[concat(variables('workspaceId'), '/datasets/SalesLTSOH')]",
 				"[concat(variables('workspaceId'), '/datasets/SalesLTSOD')]",
 				"[concat(variables('workspaceId'), '/datasets/DimensionProduct')]",
+				"[concat(variables('workspaceId'), '/datasets/DimensionAddress')]",
 				"[concat(variables('workspaceId'), '/datasets/SalesOrderHeaderFact')]",
 				"[concat(variables('workspaceId'), '/datasets/SalesOrderDetailFact')]"
 			]
@@ -3113,17 +2701,24 @@
 						},
 						{
 							"dataset": {
-								"referenceName": "CustomerDimension",
+								"referenceName": "DimCustomer",
 								"type": "DatasetReference"
 							},
 							"name": "DimCustomer"
 						},
 						{
 							"dataset": {
-								"referenceName": "AddressDimensions",
+								"referenceName": "DimensionAddress",
 								"type": "DatasetReference"
 							},
 							"name": "DimAddress"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimensionProduct",
+								"type": "DatasetReference"
+							},
+							"name": "DimProduct"
 						}
 					],
 					"sinks": [
@@ -3132,21 +2727,21 @@
 								"referenceName": "DimensionProduct",
 								"type": "DatasetReference"
 							},
-							"name": "SinkProductDimension"
+							"name": "SinkProduct"
 						},
 						{
 							"dataset": {
-								"referenceName": "CustomerDimension",
+								"referenceName": "DimCustomer",
 								"type": "DatasetReference"
 							},
-							"name": "Sink"
+							"name": "SinkCustomer"
 						},
 						{
 							"dataset": {
-								"referenceName": "AddressDimensions",
+								"referenceName": "DimensionAddress",
 								"type": "DatasetReference"
 							},
-							"name": "sink1"
+							"name": "SinkAddress"
 						}
 					],
 					"transformations": [
@@ -3206,25 +2801,43 @@
 							"name": "AllowUpserts"
 						},
 						{
+							"name": "SelectAddress"
+						},
+						{
+							"name": "CreateProductHash"
+						},
+						{
+							"name": "ExistsProduct"
+						},
+						{
+							"name": "LookupProdID"
+						},
+						{
+							"name": "SetDatesProduct"
+						},
+						{
+							"name": "AllowUpsertsProduct"
+						},
+						{
 							"name": "CreateAddressHash"
 						},
 						{
-							"name": "SelectAddress"
+							"name": "ExistsAddress"
 						},
 						{
 							"name": "LookupAddressID"
 						},
 						{
-							"name": "Exists1"
-						},
-						{
 							"name": "SetDatesAddress"
 						},
 						{
-							"name": "AllowUpsert"
+							"name": "AllowUpsertsAddress"
+						},
+						{
+							"name": "SelectProductAgg"
 						}
 					],
-					"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as double,\n\t\tListPrice as double,\n\t\tSize as string,\n\t\tWeight as double,\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as date,\n\t\tSellEndDate as date,\n\t\tDiscontinuedDate as date,\n\t\tThumbNailPhoto as string,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Product\nsource(output(\n\t\tProductCategoryID as integer,\n\t\tParentProductCategoryID as integer,\n\t\tName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductCategory\nsource(output(\n\t\tProductDescriptionID as integer,\n\t\tDescription as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductDescription\nsource(output(\n\t\tProductModelID as integer,\n\t\tName as string,\n\t\tCatalogDescription as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductModel\nsource(output(\n\t\tProductModelID as integer,\n\t\tProductDescriptionID as integer,\n\t\tCulture as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductModelProductDescription\nsource(output(\n\t\tColumn_1 as integer,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Address\nsource(output(\n\t\tColumn_1 as integer,\n\t\tColumn_2 as boolean,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string,\n\t\tColumn_10 as string,\n\t\tColumn_11 as string,\n\t\tColumn_12 as string,\n\t\tColumn_13 as string,\n\t\tColumn_14 as string,\n\t\tColumn_15 as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Customer\nsource(output(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCustomer\nsource(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimAddress\nProductModelProductDescription, ProductDescription join(ProductModelProductDescription@ProductDescriptionID == ProductDescription@ProductDescriptionID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdDescandProdModProdDesc\nProduct, ProductCategory join(Product@ProductCategoryID == ProductCategory@ProductCategoryID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdandProdCat\nProductModel, JoinProdandProdCat join(ProductModel@ProductModelID == Product@ProductModelID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdModandProdProdCat\nJoinProdModandProdProdCat, JoinProdDescandProdModProdDesc join(ProductModel@ProductModelID == ProductModelProductDescription@ProductModelID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProduct\nJoinProduct select(mapColumn(\n\t\tProductModelID = ProductModel@ProductModelID,\n\t\tProductDescriptionID = ProductDescription@ProductDescriptionID,\n\t\tProductCategoryID = Product@ProductCategoryID,\n\t\tProductID,\n\t\tProductModelID = ProductModel@ProductModelID,\n\t\tModelName = ProductModel@Name,\n\t\tCatalogDescription,\n\t\tProductName = Product@Name,\n\t\tProductNumber,\n\t\tColor,\n\t\tStandardCost,\n\t\tListPrice,\n\t\tSize,\n\t\tWeight,\n\t\tSellStartDateID = SellStartDate,\n\t\tSellEndDateID = SellEndDate,\n\t\tDiscontinuedDateID = DiscontinuedDate,\n\t\tModifiedDateID = Product@ModifiedDate,\n\t\tProductCategoryName = ProductCategory@Name,\n\t\tCulture,\n\t\tDescription\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProduct\nSelectProduct pivot(groupBy(Description),\n\tpivotBy(Culture),\n\tDescriptionCulture = max(Description),\n\tcolumnNaming: '$N$V',\n\tlateral: false) ~> PivotProduct\nPivotProduct derive(DescriptionCultureAr = toString(byName('DescriptionCulturear    ')),\n\t\tDescriptionCultureEn = toString(byName('DescriptionCultureen    ')),\n\t\tDescriptionCultureFr = toString(byName('DescriptionCulturefr    ')),\n\t\tDescriptionCultureHe = toString(byName('DescriptionCulturehe    ')),\n\t\tDescriptionCultureTh = toString(byName('DescriptionCultureth    ')),\n\t\t{DescriptionCultureZh-cht} = toString(byName('DescriptionCulturezh-cht'))) ~> MapDriftProduct\nMapDriftProduct, SelectProduct join(PivotProduct@Description == SelectProduct@Description,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProduct1\nJoinProduct1 aggregate(groupBy(ProductID),\n\tDescriptionCultureAr = max(DescriptionCultureAr),\n\t\t{DescriptionCultureEn    } = max(DescriptionCultureEn),\n\t\t{DescriptionCultureFr   } = max(DescriptionCultureFr),\n\t\tDescriptionCultureHe = max(DescriptionCultureHe),\n\t\tDescriptionCultureTh = max(DescriptionCultureTh),\n\t\t{DescriptionCultureZh-cht} = max({DescriptionCultureZh-cht})) ~> AggProdDesc\nAggProdDesc, SelectProduct join(AggProdDesc@ProductID == SelectProduct@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinProduct2\nJoinProduct2 select(mapColumn(\n\t\tProductID = SelectProduct@ProductID,\n\t\tProductModelID,\n\t\tProductDescriptionID,\n\t\tDescriptionCultureAr,\n\t\t{DescriptionCultureEn    },\n\t\t{DescriptionCultureFr   },\n\t\tDescriptionCultureHe,\n\t\tDescriptionCultureTh,\n\t\t{DescriptionCultureZh-cht},\n\t\tProductCategoryID,\n\t\tModelName,\n\t\tProductName,\n\t\tProductCategoryName,\n\t\tProductNumber,\n\t\tColor,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellStartDateID,\n\t\tSellEndDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProduct2\nSelectProduct2 aggregate(groupBy(ProductID,\n\t\tProductModelID,\n\t\tProductCategoryID,\n\t\tModelName,\n\t\tProductName,\n\t\tColor,\n\t\tProductNumber,\n\t\tProductCategoryName,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellEndDateID,\n\t\tSellStartDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID),\n\tDescriptionCultureAr = max(DescriptionCultureAr),\n\t\t{DescriptionCultureEn    } = max({DescriptionCultureEn    }),\n\t\t{DescriptionCultureFr    } = max({DescriptionCultureFr   }),\n\t\tDescriptionCultureHe = max(DescriptionCultureHe),\n\t\tDescriptionCultureTh = max(DescriptionCultureTh),\n\t\t{DescriptionCultureZh-cht} = max({DescriptionCultureZh-cht})) ~> AggProduct\nCustomer select(mapColumn(\n\t\tCustomerID = Column_1,\n\t\tNameStyle = Column_2,\n\t\tTitle = Column_3,\n\t\tFirstName = Column_4,\n\t\tMiddleName = Column_5,\n\t\tLastName = Column_6,\n\t\tSuffix = Column_7,\n\t\tCompanyName = Column_8,\n\t\tSalesPerson = Column_9,\n\t\tEmailAddress = Column_10,\n\t\tPhone = Column_11,\n\t\tPasswordHash = Column_12,\n\t\tPasswordSalt = Column_13,\n\t\tModifiedDate = Column_14\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCustomer\nSelectCustomer derive(HashKey = sha2(256, iifNull(Title,'') +FirstName +iifNull(MiddleName,'') +LastName +iifNull(Suffix,'') +iifNull(CompanyName,'') +iifNull(SalesPerson,'') +iifNull(EmailAddress,'') +iifNull(Phone,''))) ~> CreateCustomerHash\nCreateCustomerHash, DimCustomer exists(CreateCustomerHash@HashKey == DimCustomer@HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists, DimCustomer lookup(SelectCustomer@CustomerID == DimCustomer@CustomerID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCustomerID\nLookupCustomerID derive(ModifiedDate = currentTimestamp()) ~> SetDates\nSetDates alterRow(upsertIf(true())) ~> AllowUpserts\nSelectAddress derive(HashKey = sha2(256,AddressLine1 +iifNull(AddressLine2,'') +iifNull(City,'') +iifNull(StateProvince,'') +iifNull(CountryRegion,'') +iifNull(PostalCode,''))) ~> CreateAddressHash\nAddress select(mapColumn(\n\t\tAddressID = Column_1,\n\t\tAddressLine1 = Column_2,\n\t\tAddressLine2 = Column_3,\n\t\tCity = Column_4,\n\t\tStateProvince = Column_5,\n\t\tCountryRegion = Column_6,\n\t\tPostalCode = Column_7,\n\t\tModifiedDate = Column_8\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAddress\nExists1, DimAddress lookup(SelectAddress@AddressID == DimAddress@AddressID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAddressID\nCreateAddressHash, DimAddress exists(CreateAddressHash@HashKey == DimAddress@HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists1\nLookupAddressID derive(ModifiedDate = currentTimestamp()) ~> SetDatesAddress\nSetDatesAddress alterRow(insertIf(true())) ~> AllowUpsert\nAggProduct sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tProductID as integer,\n\t\tModelName as string,\n\t\tProductName as string,\n\t\tColor as string,\n\t\tProductNumber as string,\n\t\tProductCategoryName as string,\n\t\tSize as string,\n\t\tListPrice as decimal(8,2),\n\t\tStandardCost as decimal(8,2),\n\t\tWeight as decimal(8,2),\n\t\tSellEndDateID as timestamp,\n\t\tSellStartDateID as timestamp,\n\t\tDiscontinuedDateID as timestamp,\n\t\tModifiedDateID as timestamp,\n\t\tDescriptionCultureAr as string,\n\t\tDescriptionCultureEn as string,\n\t\tDescriptionCultureFr as string,\n\t\tDescriptionCultureHe as string,\n\t\tDescriptionCultureTh as string,\n\t\t{DescriptionCultureZh-cht} as string\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\ttruncate:true,\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tProductID,\n\t\tModelName,\n\t\tProductName,\n\t\tColor,\n\t\tProductNumber,\n\t\tProductCategoryName,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellEndDateID,\n\t\tSellStartDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID,\n\t\tDescriptionCultureAr,\n\t\tDescriptionCultureEn = {DescriptionCultureEn    },\n\t\tDescriptionCultureFr = {DescriptionCultureFr    },\n\t\tDescriptionCultureHe,\n\t\tDescriptionCultureTh,\n\t\t{DescriptionCultureZh-cht}\n\t)) ~> SinkProductDimension\nAllowUpserts sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['CustomerID'],\n\tformat: 'table',\n\tstaged: true,\n\tallowCopyCommand: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tCustomerID = SelectCustomer@CustomerID,\n\t\tTitle = SelectCustomer@Title,\n\t\tFirstName = SelectCustomer@FirstName,\n\t\tMiddleName = SelectCustomer@MiddleName,\n\t\tLastName = SelectCustomer@LastName,\n\t\tSuffix = SelectCustomer@Suffix,\n\t\tCompanyName = SelectCustomer@CompanyName,\n\t\tSalesPerson = SelectCustomer@SalesPerson,\n\t\tEmailAddress = SelectCustomer@EmailAddress,\n\t\tPhone = SelectCustomer@Phone,\n\t\tPasswordHash = SelectCustomer@PasswordHash,\n\t\tPasswordSalt = SelectCustomer@PasswordSalt,\n\t\tModifiedDate,\n\t\tHashKey = CreateCustomerHash@HashKey\n\t)) ~> Sink\nAllowUpsert sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\tModifiedDate as timestamp,\n\t\tHashKey as string\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['AddressID'],\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tAddressID = SelectAddress@AddressID,\n\t\tAddressLine1 = SelectAddress@AddressLine1,\n\t\tAddressLine2 = SelectAddress@AddressLine2,\n\t\tCity = SelectAddress@City,\n\t\tStateProvince = SelectAddress@StateProvince,\n\t\tCountryRegion = SelectAddress@CountryRegion,\n\t\tPostalCode = SelectAddress@PostalCode,\n\t\tModifiedDate,\n\t\tHashKey = CreateAddressHash@HashKey\n\t)) ~> sink1"
+					"script": "source(output(\n\t\tProductID as integer,\n\t\tName as string,\n\t\tProductNumber as string,\n\t\tColor as string,\n\t\tStandardCost as double,\n\t\tListPrice as double,\n\t\tSize as string,\n\t\tWeight as double,\n\t\tProductCategoryID as integer,\n\t\tProductModelID as integer,\n\t\tSellStartDate as date,\n\t\tSellEndDate as date,\n\t\tDiscontinuedDate as date,\n\t\tThumbNailPhoto as string,\n\t\tThumbnailPhotoFileName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Product\nsource(output(\n\t\tProductCategoryID as integer,\n\t\tParentProductCategoryID as integer,\n\t\tName as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductCategory\nsource(output(\n\t\tProductDescriptionID as integer,\n\t\tDescription as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductDescription\nsource(output(\n\t\tProductModelID as integer,\n\t\tName as string,\n\t\tCatalogDescription as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductModel\nsource(output(\n\t\tProductModelID as integer,\n\t\tProductDescriptionID as integer,\n\t\tCulture as string,\n\t\trowguid as string,\n\t\tModifiedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> ProductModelProductDescription\nsource(output(\n\t\tColumn_1 as integer,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Address\nsource(output(\n\t\tColumn_1 as integer,\n\t\tColumn_2 as boolean,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string,\n\t\tColumn_10 as string,\n\t\tColumn_11 as string,\n\t\tColumn_12 as string,\n\t\tColumn_13 as string,\n\t\tColumn_14 as string,\n\t\tColumn_15 as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Customer\nsource(output(\n\t\tCustomerID as long,\n\t\tTitle as string,\n\t\tFirstName as string,\n\t\tMiddleName as string,\n\t\tLastName as string,\n\t\tSuffix as string,\n\t\tCompanyName as string,\n\t\tSalesPerson as string,\n\t\tEmailAddress as string,\n\t\tPhone as string,\n\t\tPasswordHash as string,\n\t\tPasswordSalt as string,\n\t\tInsertedDate as timestamp,\n\t\tHashkey as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCustomer\nsource(output(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\tInsertedDate as timestamp,\n\t\tHashkey as string,\n\t\tModifiedDate as timestamp\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimAddress\nsource(output(\n\t\tProductID as integer,\n\t\tModelName as string,\n\t\tProductName as string,\n\t\tColor as string,\n\t\tProductNumber as string,\n\t\tProductCategoryName as string,\n\t\tSize as string,\n\t\tListPrice as double,\n\t\tStandardCost as double,\n\t\tWeight as double,\n\t\tSellEndDateID as timestamp,\n\t\tSellStartDateID as timestamp,\n\t\tDiscontinuedDateID as string,\n\t\tModifiedDateID as timestamp,\n\t\tDescriptionCultureAr as string,\n\t\tDescriptionCultureEn as string,\n\t\tDescriptionCultureFr as string,\n\t\tDescriptionCultureHe as string,\n\t\tDescriptionCultureTh as string,\n\t\t{DescriptionCultureZh-cht} as string,\n\t\tInsertedDate as string,\n\t\tHashKey as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimProduct\nProductModelProductDescription, ProductDescription join(ProductModelProductDescription@ProductDescriptionID == ProductDescription@ProductDescriptionID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdDescandProdModProdDesc\nProduct, ProductCategory join(Product@ProductCategoryID == ProductCategory@ProductCategoryID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdandProdCat\nProductModel, JoinProdandProdCat join(ProductModel@ProductModelID == Product@ProductModelID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProdModandProdProdCat\nJoinProdModandProdProdCat, JoinProdDescandProdModProdDesc join(ProductModel@ProductModelID == ProductModelProductDescription@ProductModelID,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProduct\nJoinProduct select(mapColumn(\n\t\tProductModelID = ProductModel@ProductModelID,\n\t\tProductDescriptionID = ProductDescription@ProductDescriptionID,\n\t\tProductCategoryID = Product@ProductCategoryID,\n\t\tProductID,\n\t\tProductModelID = ProductModel@ProductModelID,\n\t\tModelName = ProductModel@Name,\n\t\tCatalogDescription,\n\t\tProductName = Product@Name,\n\t\tProductNumber,\n\t\tColor,\n\t\tStandardCost,\n\t\tListPrice,\n\t\tSize,\n\t\tWeight,\n\t\tSellStartDateID = SellStartDate,\n\t\tSellEndDateID = SellEndDate,\n\t\tDiscontinuedDateID = DiscontinuedDate,\n\t\tModifiedDateID = Product@ModifiedDate,\n\t\tProductCategoryName = ProductCategory@Name,\n\t\tCulture,\n\t\tDescription\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProduct\nSelectProduct pivot(groupBy(Description),\n\tpivotBy(Culture),\n\tDescriptionCulture = max(Description),\n\tcolumnNaming: '$N$V',\n\tlateral: false) ~> PivotProduct\nPivotProduct derive(DescriptionCultureAr = toString(byName('DescriptionCulturear    ')),\n\t\tDescriptionCultureEn = toString(byName('DescriptionCultureen    ')),\n\t\tDescriptionCultureFr = toString(byName('DescriptionCulturefr    ')),\n\t\tDescriptionCultureHe = toString(byName('DescriptionCulturehe    ')),\n\t\tDescriptionCultureTh = toString(byName('DescriptionCultureth    ')),\n\t\t{DescriptionCultureZh-cht} = toString(byName('DescriptionCulturezh-cht'))) ~> MapDriftProduct\nMapDriftProduct, SelectProduct join(PivotProduct@Description == SelectProduct@Description,\n\tjoinType:'left',\n\tbroadcast: 'auto')~> JoinProduct1\nJoinProduct1 aggregate(groupBy(ProductID),\n\tDescriptionCultureAr = max(DescriptionCultureAr),\n\t\t{DescriptionCultureEn    } = max(DescriptionCultureEn),\n\t\t{DescriptionCultureFr   } = max(DescriptionCultureFr),\n\t\tDescriptionCultureHe = max(DescriptionCultureHe),\n\t\tDescriptionCultureTh = max(DescriptionCultureTh),\n\t\t{DescriptionCultureZh-cht} = max({DescriptionCultureZh-cht})) ~> AggProdDesc\nAggProdDesc, SelectProduct join(AggProdDesc@ProductID == SelectProduct@ProductID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> JoinProduct2\nJoinProduct2 select(mapColumn(\n\t\tProductID = SelectProduct@ProductID,\n\t\tProductModelID,\n\t\tProductDescriptionID,\n\t\tDescriptionCultureAr,\n\t\t{DescriptionCultureEn    },\n\t\t{DescriptionCultureFr   },\n\t\tDescriptionCultureHe,\n\t\tDescriptionCultureTh,\n\t\t{DescriptionCultureZh-cht},\n\t\tProductCategoryID,\n\t\tModelName,\n\t\tProductName,\n\t\tProductCategoryName,\n\t\tProductNumber,\n\t\tColor,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellStartDateID,\n\t\tSellEndDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProduct2\nSelectProduct2 aggregate(groupBy(ProductID,\n\t\tProductModelID,\n\t\tProductCategoryID,\n\t\tModelName,\n\t\tProductName,\n\t\tColor,\n\t\tProductNumber,\n\t\tProductCategoryName,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellEndDateID,\n\t\tSellStartDateID,\n\t\tDiscontinuedDateID,\n\t\tModifiedDateID),\n\tDescriptionCultureAr = max(DescriptionCultureAr),\n\t\t{DescriptionCultureEn    } = max({DescriptionCultureEn    }),\n\t\t{DescriptionCultureFr    } = max({DescriptionCultureFr   }),\n\t\tDescriptionCultureHe = max(DescriptionCultureHe),\n\t\tDescriptionCultureTh = max(DescriptionCultureTh),\n\t\t{DescriptionCultureZh-cht} = max({DescriptionCultureZh-cht})) ~> AggProduct\nCustomer select(mapColumn(\n\t\tCustomerID = Column_1,\n\t\tNameStyle = Column_2,\n\t\tTitle = Column_3,\n\t\tFirstName = Column_4,\n\t\tMiddleName = Column_5,\n\t\tLastName = Column_6,\n\t\tSuffix = Column_7,\n\t\tCompanyName = Column_8,\n\t\tSalesPerson = Column_9,\n\t\tEmailAddress = Column_10,\n\t\tPhone = Column_11,\n\t\tPasswordHash = Column_12,\n\t\tPasswordSalt = Column_13,\n\t\tInsertedDate = Column_15\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCustomer\nSelectCustomer derive(HashKey = sha2(256, iifNull(Title,'') +FirstName +iifNull(MiddleName,'') +LastName +iifNull(Suffix,'') +iifNull(CompanyName,'') +iifNull(SalesPerson,'') +iifNull(EmailAddress,'') +iifNull(Phone,''))) ~> CreateCustomerHash\nCreateCustomerHash, DimCustomer exists(CreateCustomerHash@HashKey == DimCustomer@Hashkey,\n\tnegate:true,\n\tbroadcast: 'auto')~> Exists\nExists, DimCustomer lookup(SelectCustomer@CustomerID == DimCustomer@CustomerID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupCustomerID\nLookupCustomerID derive(InsertedDate = iif(isNull(SelectCustomer@InsertedDate), currentDate(), SelectCustomer@InsertedDate),\n\t\tModifiedDate = currentTimestamp()) ~> SetDates\nSetDates alterRow(upsertIf(true())) ~> AllowUpserts\nAddress select(mapColumn(\n\t\tAddressID = Column_1,\n\t\tAddressLine1 = Column_2,\n\t\tAddressLine2 = Column_3,\n\t\tCity = Column_4,\n\t\tStateProvince = Column_5,\n\t\tCountryRegion = Column_6,\n\t\tPostalCode = Column_7,\n\t\tInsertedDate = Column_9\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectAddress\nSelectProductAgg derive(HashKey = sha2(256, iifNull(ProductName,'')  \r\n+iifNull(ProductCategoryName,'') \r\n+iifNull(ModelName,'')\r\n+iifNull(Color,'') \r\n+iifNull(DescriptionCultureAr,'') \r\n+iifNull(DescriptionCultureEn,'') \r\n+iifNull(DescriptionCultureFr,'') \r\n+iifNull(DescriptionCultureHe,'') \r\n+iifNull(DescriptionCultureTh,'') \r\n+iifNull({DescriptionCultureZh-cht},''))) ~> CreateProductHash\nCreateProductHash, DimProduct exists(CreateProductHash@HashKey == DimProduct@HashKey,\n\tnegate:true,\n\tbroadcast: 'auto')~> ExistsProduct\nExistsProduct, DimProduct lookup(SelectProductAgg@ProductID == DimProduct@ProductID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupProdID\nLookupProdID derive(InsertedDate = iif(isNull(SelectProductAgg@InsertedDate), \r\ncurrentDate(), SelectProductAgg@InsertedDate),\n\t\tModifiedDateID = currentTimestamp()) ~> SetDatesProduct\nSetDatesProduct alterRow(upsertIf(true())) ~> AllowUpsertsProduct\nSelectAddress derive(HashKey = sha2(256, iifNull(AddressLine1,'') \r\n+iifNull(AddressLine2,'')  \r\n+iifNull(City,'') \r\n+iifNull(StateProvince,'')  \r\n+iifNull(CountryRegion,'') \r\n+iifNull(PostalCode,''))) ~> CreateAddressHash\nCreateAddressHash, DimAddress exists(SelectAddress@AddressID == DimAddress@AddressID,\n\tnegate:true,\n\tbroadcast: 'auto')~> ExistsAddress\nExistsAddress, DimAddress lookup(SelectAddress@AddressID == DimAddress@AddressID,\n\tmultiple: false,\n\tpickup: 'any',\n\tbroadcast: 'auto')~> LookupAddressID\nLookupAddressID derive(InsertedDate = iif(isNull(SelectAddress@InsertedDate), \r\ncurrentDate(), SelectAddress@InsertedDate),\n\t\tModifiedDate = currentTimestamp()) ~> SetDatesAddress\nSetDatesAddress alterRow(upsertIf(true())) ~> AllowUpsertsAddress\nAggProduct select(mapColumn(\n\t\tProductID,\n\t\tProductModelID,\n\t\tProductCategoryID,\n\t\tModelName,\n\t\tProductName,\n\t\tColor,\n\t\tProductNumber,\n\t\tProductCategoryName,\n\t\tSize,\n\t\tListPrice,\n\t\tStandardCost,\n\t\tWeight,\n\t\tSellEndDateID,\n\t\tSellStartDateID,\n\t\tDiscontinuedDateID,\n\t\tInsertedDate = ModifiedDateID,\n\t\tDescriptionCultureAr,\n\t\tDescriptionCultureEn = {DescriptionCultureEn    },\n\t\tDescriptionCultureFr = {DescriptionCultureFr    },\n\t\tDescriptionCultureHe,\n\t\tDescriptionCultureTh,\n\t\t{DescriptionCultureZh-cht}\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectProductAgg\nAllowUpsertsProduct sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tProductID as integer,\n\t\tModelName as string,\n\t\tProductName as string,\n\t\tColor as string,\n\t\tProductNumber as string,\n\t\tProductCategoryName as string,\n\t\tSize as string,\n\t\tListPrice as double,\n\t\tStandardCost as double,\n\t\tWeight as double,\n\t\tSellEndDateID as timestamp,\n\t\tSellStartDateID as timestamp,\n\t\tDiscontinuedDateID as string,\n\t\tModifiedDateID as timestamp,\n\t\tDescriptionCultureAr as string,\n\t\tDescriptionCultureEn as string,\n\t\tDescriptionCultureFr as string,\n\t\tDescriptionCultureHe as string,\n\t\tDescriptionCultureTh as string,\n\t\t{DescriptionCultureZh-cht} as string,\n\t\tInsertedDate as string,\n\t\tHashKey as string\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['ProductID'],\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tProductID = SelectProductAgg@ProductID,\n\t\tModelName = SelectProductAgg@ModelName,\n\t\tProductName = SelectProductAgg@ProductName,\n\t\tColor = SelectProductAgg@Color,\n\t\tProductNumber = SelectProductAgg@ProductNumber,\n\t\tProductCategoryName = SelectProductAgg@ProductCategoryName,\n\t\tSize = SelectProductAgg@Size,\n\t\tListPrice = SelectProductAgg@ListPrice,\n\t\tStandardCost = SelectProductAgg@StandardCost,\n\t\tWeight = SelectProductAgg@Weight,\n\t\tDescriptionCultureAr = SelectProductAgg@DescriptionCultureAr,\n\t\tDescriptionCultureEn = SelectProductAgg@DescriptionCultureEn,\n\t\tDescriptionCultureFr = SelectProductAgg@DescriptionCultureFr,\n\t\tDescriptionCultureHe = SelectProductAgg@DescriptionCultureHe,\n\t\tDescriptionCultureTh = SelectProductAgg@DescriptionCultureTh,\n\t\t{DescriptionCultureZh-cht} = SelectProductAgg@{DescriptionCultureZh-cht},\n\t\tSellStartDateID = SelectProductAgg@SellStartDateID,\n\t\tSellEndDateID = SelectProductAgg@SellEndDateID,\n\t\tDiscontinuedDateID = SelectProductAgg@DiscontinuedDateID,\n\t\tInsertedDate,\n\t\tHashKey = CreateProductHash@HashKey,\n\t\tModifiedDateID\n\t)) ~> SinkProduct\nAllowUpserts sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['CustomerID'],\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tCustomerID = SelectCustomer@CustomerID,\n\t\tTitle = SelectCustomer@Title,\n\t\tFirstName = SelectCustomer@FirstName,\n\t\tMiddleName = SelectCustomer@MiddleName,\n\t\tLastName = SelectCustomer@LastName,\n\t\tSuffix = SelectCustomer@Suffix,\n\t\tCompanyName = SelectCustomer@CompanyName,\n\t\tSalesPerson = SelectCustomer@SalesPerson,\n\t\tEmailAddress = SelectCustomer@EmailAddress,\n\t\tPhone = SelectCustomer@Phone,\n\t\tPasswordHash = SelectCustomer@PasswordHash,\n\t\tPasswordSalt = SelectCustomer@PasswordSalt,\n\t\tInsertedDate,\n\t\tHashkey = CreateCustomerHash@HashKey,\n\t\tModifiedDate\n\t)) ~> SinkCustomer\nAllowUpsertsAddress sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tAddressID as integer,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tStateProvince as string,\n\t\tCountryRegion as string,\n\t\tPostalCode as string,\n\t\tInsertedDate as timestamp,\n\t\tHashkey as string,\n\t\tModifiedDate as timestamp\n\t),\n\tdeletable:false,\n\tinsertable:false,\n\tupdateable:false,\n\tupsertable:true,\n\tkeys:['AddressID'],\n\tformat: 'table',\n\tstaged: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\terrorHandlingOption: 'stopOnFirstError',\n\tmapColumn(\n\t\tAddressID = SelectAddress@AddressID,\n\t\tAddressLine1 = SelectAddress@AddressLine1,\n\t\tAddressLine2 = SelectAddress@AddressLine2,\n\t\tCity = SelectAddress@City,\n\t\tStateProvince = SelectAddress@StateProvince,\n\t\tCountryRegion = SelectAddress@CountryRegion,\n\t\tPostalCode = SelectAddress@PostalCode,\n\t\tInsertedDate,\n\t\tHashkey = CreateAddressHash@HashKey,\n\t\tModifiedDate\n\t)) ~> SinkAddress"
 				}
 			},
 			"dependsOn": [
@@ -3235,8 +2848,8 @@
 				"[concat(variables('workspaceId'), '/datasets/SalesLTProductModelProductDesc')]",
 				"[concat(variables('workspaceId'), '/datasets/SalesLTAddress')]",
 				"[concat(variables('workspaceId'), '/datasets/SalesLTCustomer')]",
-				"[concat(variables('workspaceId'), '/datasets/CustomerDimension')]",
-				"[concat(variables('workspaceId'), '/datasets/AddressDimensions')]",
+				"[concat(variables('workspaceId'), '/datasets/DimCustomer')]",
+				"[concat(variables('workspaceId'), '/datasets/DimensionAddress')]",
 				"[concat(variables('workspaceId'), '/datasets/DimensionProduct')]"
 			]
 		},
@@ -3531,6 +3144,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/CreateProdDim')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = '[Product]' AND O.TYPE = 'U' AND S.NAME = '[ext]')\nCREATE TABLE [adventureworks_schema].[Product_Dim]\n\t(\n\t [ProductID] int,\n     [ModelName] nvarchar(4000),\n\t [ProductName] nvarchar(4000),\n     [Color] nvarchar(4000),\n\t [ProductNumber] nvarchar(4000),\n\t [ProductCategoryName] nvarchar(4000),\n     [Size] nvarchar(4000),\n     [ListPrice] float,\n\t [StandardCost] float,\n\t [Weight] float,\n     [SellEndDateID] datetime2(0),\n\t [SellStartDateID] datetime2(0),\n\t [DiscontinuedDateID] nvarchar(4000),\n     [ModifiedDateID] DATETIME2(0),\n     [DescriptionCultureAr] nvarchar(4000),\n     [DescriptionCultureEn] nvarchar(4000),\n     [DescriptionCultureFr] nvarchar(4000),\n     [DescriptionCultureHe] nvarchar(4000),\n     [DescriptionCultureTh] nvarchar(4000),\n     [DescriptionCultureZh-cht] nvarchar(4000),\n\t [InsertedDate]nvarchar(4000),\n     [HashKey] nvarchar(4000),\n     [Status] nvarchar(4000)\n\t \n\t)\nWITH\n\t(\n\tDISTRIBUTION = ROUND_ROBIN,\n\t HEAP\n\t)\nGO\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"poolName": "sqlpool_adventureworksLT_jhb",
+						"databaseName": "sqlpool_adventureworksLT_jhb"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/CreateSODFact')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -3591,86 +3224,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT TOP (100) [CustomerID]\n,[Title]\n,[FirstName]\n,[MiddleName]\n,[LastName]\n,[Suffix]\n,[CompanyName]\n,[SalesPerson]\n,[EmailAddress]\n,[Phone]\n,[PasswordHash]\n,[PasswordSalt]\n,[ModifiedDate]\n,[HashKey]\n FROM [adventureworks_schema].[Customer_Dim]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 2')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT *\n FROM [adventureworks_schema].[Address_Dim]\n\n ALTER TABLE [adventureworks_schema].[Address_Dim]\nADD HashKey nvarchar(200);",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 3')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT TOP (100) [AddressID]\n,[AddressLine1]\n,[AddressLine2]\n,[City]\n,[StateProvince]\n,[CountryRegion]\n,[PostalCode]\n,[ModifiedDate]\n,[HashKey]\n FROM [adventureworks_schema].[Address_Dim]",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/SQL script 4')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"content": {
-					"query": "SELECT *\n FROM [adventureworks_schema].[Address_Dim]\n WHERE AddressID = ",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"poolName": "sqlpool_adventureworksLT_jhb",
-						"databaseName": "sqlpool_adventureworksLT_jhb"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/sqlpool_adventureworksLT_jhb')]",
 			"type": "Microsoft.Synapse/workspaces/sqlPools",
 			"apiVersion": "2019-06-01-preview",
@@ -3702,6 +3255,191 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimensionAddress')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "AddressLine1",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "StateProvince",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CountryRegion",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PostalCode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "InsertedDate",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "Hashkey",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime2",
+						"scale": 0
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Address_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DimensionProduct')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_synapse_adventureworks_lt",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "ProductID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ModelName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Color",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductNumber",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductCategoryName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Size",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ListPrice",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "StandardCost",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "Weight",
+						"type": "float",
+						"precision": 15
+					},
+					{
+						"name": "SellEndDateID",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "SellStartDateID",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "DiscontinuedDateID",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ModifiedDateID",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "DescriptionCultureAr",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureEn",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureFr",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureHe",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureTh",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DescriptionCultureZh-cht",
+						"type": "nvarchar"
+					},
+					{
+						"name": "InsertedDate",
+						"type": "nvarchar"
+					},
+					{
+						"name": "HashKey",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "adventureworks_schema",
+					"table": "Product_Dim"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/ls_synapse_adventureworks_lt')]"
 			]
 		}
 	]
