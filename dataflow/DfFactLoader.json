@@ -43,14 +43,14 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "SalesOrderHeaderFact",
+						"referenceName": "SOHFact",
 						"type": "DatasetReference"
 					},
 					"name": "sinkSOH"
 				},
 				{
 					"dataset": {
-						"referenceName": "SalesOrderDetailFact",
+						"referenceName": "SODFact",
 						"type": "DatasetReference"
 					},
 					"name": "sinkSOD"
