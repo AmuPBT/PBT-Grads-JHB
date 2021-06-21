@@ -34,7 +34,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "ProductDimension",
+						"referenceName": "DimensionProduct",
 						"type": "DatasetReference"
 					},
 					"name": "Product"

@@ -69,7 +69,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "ProductDimension",
+						"referenceName": "DimensionProduct",
 						"type": "DatasetReference"
 					},
 					"name": "DimProduct"
@@ -78,7 +78,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ProductDimension",
+						"referenceName": "DimensionProduct",
 						"type": "DatasetReference"
 					},
 					"name": "SinkProduct"
