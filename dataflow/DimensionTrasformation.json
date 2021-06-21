@@ -62,7 +62,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "AddressDim",
+						"referenceName": "DimensionAddress",
 						"type": "DatasetReference"
 					},
 					"name": "DimAddress"
@@ -92,7 +92,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "AddressDim",
+						"referenceName": "DimensionAddress",
 						"type": "DatasetReference"
 					},
 					"name": "SinkAddress"

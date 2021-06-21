@@ -41,7 +41,7 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "AddressDim",
+						"referenceName": "DimensionAddress",
 						"type": "DatasetReference"
 					},
 					"name": "Address"
