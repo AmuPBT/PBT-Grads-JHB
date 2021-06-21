@@ -3,7 +3,10 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_synapse_adventureworks_lt",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"adventureworks_schema": "sqlpool_adventureworksLT_jhb"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlDWTable",
